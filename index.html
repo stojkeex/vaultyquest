@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vaulty Quest - Gamify Your Life</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0a0a; /* Slightly darker black */
+            color: #e5e7eb; /* Off-white for softer text */
+            -webkit-tap-highlight-color: transparent;
+        }
+        .gradient-accent {
+            background-image: linear-gradient(to right, #14b8a6, #6366f1); /* Teal to Indigo */
+        }
+        .gradient-text {
+            background-image: linear-gradient(to right, #5eead4, #818cf8); /* Lighter Teal to Lighter Indigo */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+        }
+        .nav-active {
+            color: #5eead4; /* Teal Accent */
+        }
+        .progress-bar-fill {
+            background-image: linear-gradient(to right, #14b8a6, #8b5cf6); /* Teal to Violet */
+            transition: width 0.5s ease-in-out;
+        }
+        .card {
+            background-color: #1f2937; /* gray-800 */
+            border: 1px solid #374151; /* gray-700 */
+            transition: border-color 0.3s ease;
+        }
+        /* Custom scrollbar for better dark mode aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111827; /* gray-900 */
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #374151; /* gray-700 */
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4b5563; /* gray-600 */
+        }
+        /* Hide scrollbar for onboarding slides */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none; /* Firefox */
+        }
+         /* Animation for modals and chat bubbles */
+        @keyframes fade-in-up {
+            from { opacity: 0; transform: translateY(20px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .animate-fade-in-up {
+            animation: fade-in-up 0.3s ease-out forwards;
+        }
+        .chat-bubble {
+            animation: fade-in-up 0.3s ease-out forwards;
+        }
+        /* Typing indicator animation */
+        .typing-dot {
+            animation: typing-blink 1.4s infinite both;
+        }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typing-blink {
+            0% { opacity: 0.2; }
+            20% { opacity: 1; }
+            100% { opacity: 0.2; }
+        }
+        .premium-lock-icon {
+            display: none;
+        }
+        .premium-locked .premium-lock-icon {
+            display: inline-block;
+        }
+        
+        /* FAB Menu Styles */
+        .fab-menu-item {
+            transition: all 0.3s ease-out;
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+        }
+        .fab-menu-open .fab-menu-item {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+        .fab-menu-open .fab-menu-item:nth-child(1) { transition-delay: 0.1s; }
+        .fab-menu-open .fab-menu-item:nth-child(2) { transition-delay: 0.2s; }
+        .fab-menu-open .fab-menu-item:nth-child(3) { transition-delay: 0.3s; }
+    </style>
+</head>
+<body class="overscroll-none">
+
+    <div id="app-container" class="h-screen w-screen overflow-hidden">
+
+        <!-- Splash Screen (Now Hidden) -->
+        <div id="splash-screen" class="hidden absolute inset-0 bg-black flex flex-col items-center justify-center z-50 transition-opacity duration-500">
+            <div class="text-center animate-pulse">
+                <h1 class="text-5xl md:text-7xl font-black gradient-text">Vaulty Quest</h1>
+                <p class="text-lg text-gray-400 mt-2">Gamify Your Life</p>
+            </div>
+        </div>
+
+        <!-- Onboarding Screen (Now Hidden) -->
+        <div id="onboarding-screen" class="hidden absolute inset-0 bg-black z-40 flex flex-col h-full">
+             <div class="flex-grow flex snap-x snap-mandatory overflow-x-auto no-scrollbar">
+                <!-- Slide 1: Main Goals -->
+                <div class="w-full h-full flex-shrink-0 snap-center flex flex-col justify-center items-center p-6 text-center">
+                    <h2 class="text-4xl font-bold gradient-text mb-4">Welcome to Vaulty Quest!</h2>
+                    <p class="text-gray-300 mb-2 max-w-md">To start your adventure, what are your main goals?</p>
+                    <p class="text-gray-400 mb-8">Choose up to 3.</p>
+                    <div class="grid grid-cols-2 gap-4 w-full max-w-md">
+                        <button class="bg-gray-800 p-4 rounded-lg border border-gray-700 hover:border-pink-500 focus:border-pink-500 focus:outline-none">💰 Finance</button>
+                        <button class="bg-gray-800 p-4 rounded-lg border border-gray-700 hover:border-pink-500 focus:border-pink-500 focus:outline-none">❤️ Health</button>
+                        <button class="bg-gray-800 p-4 rounded-lg border border-gray-700 hover:border-pink-500 focus:border-pink-500 focus:outline-none">🧠 Learning</button>
+                        <button class="bg-gray-800 p-4 rounded-lg border border-gray-700 hover:border-pink-500 focus:border-pink-500 focus:outline-none">👥 Social</button>
+                    </div>
+                </div>
+                <!-- Slide 2: Connect Account -->
+                <div class="w-full h-full flex-shrink-0 snap-center flex flex-col justify-center items-center p-6 text-center">
+                    <h2 class="text-3xl font-bold gradient-text mb-2">Create Your Account</h2>
+                    <p class="text-gray-400 mb-8">Connect an account to save your progress.</p>
+                    <div class="space-y-4 w-full max-w-xs">
+                         <button class="w-full flex items-center justify-center p-3 bg-gray-800 rounded-lg border border-gray-700 hover:bg-gray-700">
+                             <i data-lucide="google" class="w-5 h-5 mr-3"></i> Continue with Google
+                         </button>
+                         <button class="w-full flex items-center justify-center p-3 bg-gray-800 rounded-lg border border-gray-700 hover:bg-gray-700">
+                             <i data-lucide="apple" class="w-5 h-5 mr-3"></i> Continue with Apple
+                         </button>
+                         <button id="start-quest-btn" class="w-full p-3 gradient-accent rounded-lg font-bold">Start Your Quest!</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main App Interface -->
+        <div id="main-app" class="absolute inset-0 bg-black z-30 flex flex-col h-full">
+            <main id="main-content" class="flex-grow overflow-y-auto pb-24">
+                <!-- Home Screen -->
+                <div id="home-screen-content" class="p-4 md:p-6 space-y-6">
+                    <header class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400">Welcome back, Adventurer!</p>
+                            <h1 class="text-3xl font-bold">Your Dashboard</h1>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="text-right">
+                                <p class="font-semibold gradient-text">Level 1</p>
+                                <div class="w-20 h-2 bg-gray-800 rounded-full mt-1">
+                                    <div class="progress-bar-fill h-2 rounded-full" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                            <img id="profile-avatar-img" src="https://placehold.co/40x40/14b8a6/ffffff?text=A" alt="Avatar" class="w-10 h-10 rounded-full border-2 border-teal-500">
+                        </div>
+                    </header>
+
+                    <!-- Daily Quests -->
+                    <div class="card p-4 rounded-xl">
+                        <div class="flex items-center justify-between mb-3">
+                             <h2 class="text-xl font-semibold">Daily Quests</h2>
+                             <button id="generate-quests-btn" class="text-sm gradient-text font-semibold flex items-center gap-1 hover:opacity-80 transition-opacity">
+                                ✨ New Quests
+                            </button>
+                        </div>
+                        <div id="daily-quests-list" class="space-y-3">
+                            <!-- Quests will be dynamically inserted here -->
+                        </div>
+                         <div id="quests-loader" class="hidden text-center p-4 text-gray-400">
+                            <p>Generating your next adventure...</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Game Board Categories -->
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        <!-- Finance -->
+                        <div class="card p-4 rounded-xl flex flex-col items-start space-y-3 hover:border-emerald-500 transition-colors">
+                            <div class="flex items-center w-full justify-between">
+                                <i data-lucide="piggy-bank" class="w-8 h-8 text-emerald-400"></i>
+                                <p class="font-semibold text-lg">Finance</p>
+                            </div>
+                            <p class="text-sm text-gray-400">Monthly Budget: 0%</p>
+                            <div class="w-full h-2 bg-gray-900 rounded-full">
+                                <div class="progress-bar-fill h-2 rounded-full" style="width: 0%;"></div>
+                            </div>
+                            <button id="open-finance-btn" class="mt-auto text-sm w-full text-center gradient-accent text-white font-semibold py-1 px-2 rounded-md hover:opacity-90 transition-opacity">✨ Analyze Spending</button>
+                        </div>
+                         <!-- Health -->
+                        <div class="card p-4 rounded-xl flex flex-col items-start space-y-3 hover:border-rose-500 transition-colors">
+                            <div class="flex items-center w-full justify-between">
+                                <i data-lucide="heart-pulse" class="w-8 h-8 text-rose-400"></i>
+                                <p class="font-semibold text-lg">Health</p>
+                            </div>
+                            <p class="text-sm text-gray-400">Daily Steps: 0/10k</p>
+                            <div class="w-full h-2 bg-gray-900 rounded-full">
+                                <div class="progress-bar-fill h-2 rounded-full" style="width: 0%;"></div>
+                            </div>
+                             <button class="mt-auto text-sm w-full text-center gradient-accent text-white font-semibold py-1 px-2 rounded-md hover:opacity-90 transition-opacity">🏃 Log Activity</button>
+                        </div>
+                        <!-- Learning -->
+                        <div class="card p-4 rounded-xl flex flex-col items-start space-y-3 hover:border-amber-500 transition-colors">
+                            <div class="flex items-center w-full justify-between">
+                                <i data-lucide="graduation-cap" class="w-8 h-8 text-amber-400"></i>
+                                <p class="font-semibold text-lg">Learning</p>
+                            </div>
+                            <p class="text-sm text-gray-400">Weekly Goal: 0/3 lessons</p>
+                            <div class="w-full h-2 bg-gray-900 rounded-full">
+                                <div class="progress-bar-fill h-2 rounded-full" style="width: 0%;"></div>
+                            </div>
+                            <button id="open-learning-btn" class="mt-auto text-sm w-full text-center gradient-accent text-white font-semibold py-1 px-2 rounded-md hover:opacity-90 transition-opacity">✨ Learn Something New</button>
+                        </div>
+                        <!-- Productivity -->
+                        <div class="card p-4 rounded-xl flex flex-col items-start space-y-3 hover:border-sky-500 transition-colors">
+                            <div class="flex items-center w-full justify-between">
+                                <i data-lucide="timer" class="w-8 h-8 text-sky-400"></i>
+                                <p class="font-semibold text-lg">Productivity</p>
+                            </div>
+                            <p class="text-sm text-gray-400">Tasks Today: 0/5</p>
+                            <div class="w-full h-2 bg-gray-900 rounded-full">
+                                <div class="progress-bar-fill h-2 rounded-full" style="width: 0%;"></div>
+                            </div>
+                            <button id="breakdown-goal-btn" class="mt-2 text-sm w-full text-center gradient-accent text-white font-semibold py-1 px-2 rounded-md hover:opacity-90 transition-opacity">✨ Break Down Goal</button>
+                        </div>
+                        <!-- Social -->
+                        <div class="card p-4 rounded-xl flex flex-col items-start space-y-3 hover:border-pink-500 transition-colors">
+                            <div class="flex items-center w-full justify-between">
+                                <i data-lucide="users" class="w-8 h-8 text-pink-400"></i>
+                                <p class="font-semibold text-lg">Social</p>
+                            </div>
+                            <p class="text-sm text-gray-400">Connections: 0</p>
+                            <div class="w-full h-2 bg-gray-900 rounded-full">
+                                <div class="progress-bar-fill h-2 rounded-full" style="width: 0%;"></div>
+                            </div>
+                            <button id="open-group-quest-btn" class="mt-2 text-sm w-full text-center gradient-accent text-white font-semibold py-1 px-2 rounded-md hover:opacity-90 transition-opacity">🤝 Start Group Quest</button>
+                        </div>
+                        <!-- Daily Reflection -->
+                        <div class="card p-4 rounded-xl flex flex-col items-start space-y-3 hover:border-violet-500 transition-colors">
+                            <div class="flex items-center w-full justify-between">
+                                <i data-lucide="sparkles" class="w-8 h-8 text-violet-400"></i>
+                                <p class="font-semibold text-lg">Reflection</p>
+                            </div>
+                            <p class="text-sm text-gray-400">Review your day.</p>
+                            <button id="open-reflection-btn" class="mt-auto text-sm w-full text-center gradient-accent text-white font-semibold py-1 px-2 rounded-md hover:opacity-90 transition-opacity">✨ Reflect Now</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Screen -->
+                <div id="chat-screen-content" class="hidden p-4 md:p-6 h-full flex flex-col">
+                    <h1 class="text-3xl font-bold text-center mb-4">AI Coach</h1>
+                    <div id="chat-messages" class="flex-grow bg-gray-900 rounded-xl p-4 space-y-4 overflow-y-auto">
+                        <!-- AI Message -->
+                        <div class="flex items-start gap-3 chat-bubble">
+                            <div class="w-8 h-8 rounded-full gradient-accent flex items-center justify-center font-bold text-sm flex-shrink-0">VQ</div>
+                            <div class="bg-gray-800 p-3 rounded-lg max-w-xs md:max-w-md">
+                                <p>Hello! How can I help you level up your life today? You can ask me to plan your day, analyze your spending, or create a new workout plan!</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex items-center gap-2 p-2 card rounded-full">
+                        <button class="p-2 hover:bg-gray-700/50 rounded-full"><i data-lucide="paperclip" class="w-5 h-5"></i></button>
+                        <input id="chat-input" type="text" placeholder="Ask your AI coach..." class="w-full bg-transparent focus:outline-none px-2">
+                        <button class="p-2 hover:bg-gray-700/50 rounded-full"><i data-lucide="mic" class="w-5 h-5"></i></button>
+                        <button id="send-chat-btn" class="p-3 gradient-accent rounded-full"><i data-lucide="send" class="w-5 h-5"></i></button>
+                    </div>
+                </div>
+
+                <!-- Modules Screen -->
+                <div id="modules-screen-content" class="hidden p-4 md:p-6">
+                    <h1 class="text-3xl font-bold mb-6">All Modules</h1>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="card p-4 rounded-xl flex items-center justify-between">
+                            <div class="flex items-center"><i data-lucide="piggy-bank" class="w-8 h-8 mr-4 text-emerald-400"></i><span class="text-lg font-semibold">Finance</span></div>
+                            <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" value="" class="sr-only peer" checked><div class="w-11 h-6 bg-gray-600 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div></label>
+                        </div>
+                        <div class="card p-4 rounded-xl flex items-center justify-between">
+                            <div class="flex items-center"><i data-lucide="heart-pulse" class="w-8 h-8 mr-4 text-rose-400"></i><span class="text-lg font-semibold">Health</span></div>
+                            <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" value="" class="sr-only peer" checked><div class="w-11 h-6 bg-gray-600 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div></label>
+                        </div>
+                        <!-- Add all other modules here... -->
+                        <div class="card p-4 rounded-xl flex items-center justify-between">
+                            <div class="flex items-center"><i data-lucide="plane" class="w-8 h-8 mr-4 text-amber-400"></i><span class="text-lg font-semibold">Travel</span></div>
+                             <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" value="" class="sr-only peer"><div class="w-11 h-6 bg-gray-600 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div></label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Screen -->
+                <div id="profile-screen-content" class="hidden p-4 md:p-6 text-center">
+                    <img id="profile-avatar-main" src="https://placehold.co/100x100/14b8a6/ffffff?text=A" alt="Avatar" class="w-24 h-24 rounded-full border-4 border-teal-500 mx-auto">
+                    <h1 class="text-3xl font-bold mt-4">Adventurer</h1>
+                    <p class="gradient-text font-semibold">Level 1 - Getting Started</p>
+                    
+                    <div id="upgrade-premium-btn" class="card rounded-xl p-4 mt-8 text-left cursor-pointer hover:bg-gray-800">
+                        <h2 class="text-xl font-bold gradient-text">Upgrade to Premium</h2>
+                        <p class="text-gray-400 mt-1">Unlock AI coaching, unlimited quests, and advanced analytics!</p>
+                    </div>
+
+                    <div id="premium-features-section" class="mt-6 text-left">
+                        <h3 class="font-semibold text-lg mb-2">Premium Features</h3>
+                        <div class="card rounded-xl divide-y divide-gray-700">
+                           <a href="#" id="analytics-btn" class="premium-locked block p-4 hover:bg-gray-800 flex justify-between items-center"><span><i data-lucide="bar-chart-3" class="inline w-5 h-5 mr-2"></i>Analytics</span> <i data-lucide="lock" class="premium-lock-icon w-4 h-4 text-yellow-400"></i></a>
+                           <a href="#" id="avatar-btn" class="premium-locked block p-4 hover:bg-gray-800 flex justify-between items-center"><span><i data-lucide="user-plus" class="inline w-5 h-5 mr-2"></i>Customize Avatar</span> <i data-lucide="lock" class="premium-lock-icon w-4 h-4 text-yellow-400"></i></a>
+                           <a href="#" class="premium-locked block p-4 hover:bg-gray-800 flex justify-between items-center"><span><i data-lucide="palette" class="inline w-5 h-5 mr-2"></i>App Themes</span> <i data-lucide="lock" class="premium-lock-icon w-4 h-4 text-yellow-400"></i></a>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 text-left">
+                        <h3 class="font-semibold text-lg mb-2">Settings</h3>
+                        <div class="card rounded-xl divide-y divide-gray-700">
+                           <a href="#" class="block p-4 hover:bg-gray-800">Account</a>
+                           <a href="#" class="block p-4 hover:bg-gray-800">Notifications</a>
+                           <a href="#" class="block p-4 hover:bg-gray-800">Security & Privacy</a>
+                           <a href="#" class="block p-4 hover:bg-gray-800 text-red-500">Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Floating Action Buttons -->
+            <div id="fab-container" class="absolute bottom-24 right-6 flex flex-col items-center space-y-3">
+                <!-- Speed Dial Menu (hidden by default) -->
+                <div class="flex flex-col items-center space-y-3">
+                    <button id="fab-add-task" class="fab-menu-item w-12 h-12 bg-gray-700 rounded-full flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform">
+                        <i data-lucide="check-square" class="w-6 h-6"></i>
+                    </button>
+                     <button id="fab-log-activity" class="fab-menu-item w-12 h-12 bg-gray-700 rounded-full flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform">
+                        <i data-lucide="heart-pulse" class="w-6 h-6"></i>
+                    </button>
+                    <button id="fab-new-goal" class="fab-menu-item w-12 h-12 bg-gray-700 rounded-full flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform">
+                        <i data-lucide="target" class="w-6 h-6"></i>
+                    </button>
+                </div>
+                <!-- Main FABs -->
+                 <button id="scan-fab-btn" class="w-12 h-12 bg-gray-700 rounded-full flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform">
+                    <i data-lucide="scan-line" class="w-6 h-6"></i>
+                </button>
+                <button id="fab-toggle-btn" class="w-14 h-14 gradient-accent rounded-full flex items-center justify-center shadow-lg transform hover:scale-110 transition-all duration-300">
+                    <i data-lucide="plus" class="w-8 h-8 transition-transform duration-300"></i>
+                </button>
+            </div>
+
+
+            <!-- Bottom Navigation Bar -->
+            <nav class="absolute bottom-0 left-0 right-0 bg-black/50 backdrop-blur-sm border-t border-gray-800">
+                <div class="flex justify-around max-w-2xl mx-auto">
+                    <button class="nav-item p-4 text-center text-gray-400 hover:text-white nav-active" data-target="home-screen">
+                        <i data-lucide="layout-dashboard" class="w-6 h-6 mx-auto"></i><span class="text-xs">Home</span>
+                    </button>
+                    <button class="nav-item p-4 text-center text-gray-400 hover:text-white" data-target="chat-screen">
+                        <i data-lucide="bot" class="w-6 h-6 mx-auto"></i><span class="text-xs">Chat</span>
+                    </button>
+                    <button class="nav-item p-4 text-center text-gray-400 hover:text-white" data-target="modules-screen">
+                        <i data-lucide="package" class="w-6 h-6 mx-auto"></i><span class="text-xs">Modules</span>
+                    </button>
+                    <button class="nav-item p-4 text-center text-gray-400 hover:text-white" data-target="profile-screen">
+                        <i data-lucide="user-circle" class="w-6 h-6 mx-auto"></i><span class="text-xs">Profile</span>
+                    </button>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Premium Subscription Modal -->
+        <div id="premium-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
+            <div class="card rounded-2xl w-full max-w-md p-6 relative animate-fade-in-up">
+                <button id="close-premium-modal" class="absolute top-4 right-4 text-gray-500 hover:text-white">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+                <h2 class="text-3xl font-black text-center gradient-text">Go Premium!</h2>
+                <p class="text-center text-gray-400 mt-2">Unlock your full potential.</p>
+                
+                <div class="mt-8 space-y-4">
+                    <div class="border-2 border-teal-500 rounded-xl p-4 text-center cursor-pointer">
+                        <p class="text-xl font-bold">149.99 € / Year</p>
+                        <p class="gradient-text font-semibold">Save 16%!</p>
+                    </div>
+                     <div class="border border-gray-700 rounded-xl p-4 text-center cursor-pointer hover:border-gray-500">
+                        <p class="text-xl font-bold">14.99 € / Month</p>
+                    </div>
+                </div>
+
+                <ul class="mt-8 space-y-3 text-sm">
+                    <li class="flex items-center"><i data-lucide="check-circle-2" class="w-5 h-5 mr-3 text-green-400"></i> **Advanced Progress Analytics**</li>
+                    <li class="flex items-center"><i data-lucide="check-circle-2" class="w-5 h-5 mr-3 text-green-400"></i> **Personalized AI Goal Coaching**</li>
+                    <li class="flex items-center"><i data-lucide="check-circle-2" class="w-5 h-5 mr-3 text-green-400"></i> **Exclusive Avatar & Theme Packs**</li>
+                    <li class="flex items-center"><i data-lucide="check-circle-2" class="w-5 h-5 mr-3 text-green-400"></i> **Group Quests & Leaderboards**</li>
+                    <li class="flex items-center"><i data-lucide="check-circle-2" class="w-5 h-5 mr-3 text-green-400"></i> **Unlimited AI-generated quests**</li>
+                    <li class="flex items-center"><i data-lucide="check-circle-2" class="w-5 h-5 mr-3 text-green-400"></i> Bank & Health device integration</li>
+                </ul>
+                
+                <button class="w-full mt-8 p-3 gradient-accent rounded-lg font-bold">Start 7-Day Free Trial</button>
+                <button id="dev-unlock-premium" class="w-full mt-2 p-2 bg-gray-700 text-xs rounded-lg">DEV: Unlock Premium</button>
+            </div>
+        </div>
+        
+        <!-- Goal Breakdown Modal -->
+        <div id="goal-breakdown-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
+            <div class="card rounded-2xl w-full max-w-md p-6 relative animate-fade-in-up">
+                <button id="close-goal-modal" class="absolute top-4 right-4 text-gray-500 hover:text-white">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+                <h2 class="text-3xl font-black text-center gradient-text">Break Down Your Goal</h2>
+                <p class="text-center text-gray-400 mt-2">Let the AI turn your big goals into small quests.</p>
+                
+                <div class="mt-8">
+                    <input id="goal-input" type="text" placeholder="e.g., Learn to cook a new recipe" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-pink-500">
+                    <button id="generate-tasks-btn" class="w-full mt-4 p-3 gradient-accent rounded-lg font-bold">✨ Generate Quests</button>
+                </div>
+
+                <div id="goal-loader" class="hidden text-center p-4 mt-4 text-gray-400">
+                    <p>Crafting your questline...</p>
+                </div>
+
+                <div id="task-results-list" class="mt-6 space-y-2 max-h-60 overflow-y-auto">
+                    <!-- Generated tasks will appear here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Daily Reflection Modal -->
+        <div id="reflection-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
+            <div class="card rounded-2xl w-full max-w-md p-6 relative animate-fade-in-up">
+                <button id="close-reflection-modal" class="absolute top-4 right-4 text-gray-500 hover:text-white">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+                <h2 class="text-3xl font-black text-center gradient-text">Daily Reflection</h2>
+                <p class="text-center text-gray-400 mt-2">How was your day, Adventurer?</p>
+                
+                <div class="mt-8">
+                    <textarea id="reflection-input" rows="4" placeholder="e.g., I had a productive day but felt a bit tired in the afternoon..." class="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-pink-500 text-sm"></textarea>
+                    <button id="generate-reflection-btn" class="w-full mt-4 p-3 gradient-accent rounded-lg font-bold">✨ Get AI Insight</button>
+                </div>
+
+                <div id="reflection-loader" class="hidden text-center p-4 mt-4 text-gray-400">
+                    <p>Analyzing your day...</p>
+                </div>
+
+                <div id="reflection-results" class="hidden mt-6 space-y-4 text-left">
+                    <!-- Generated reflection will appear here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Learning Modal -->
+        <div id="learning-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
+            <div class="card rounded-2xl w-full max-w-md p-6 relative animate-fade-in-up">
+                <button id="close-learning-modal" class="absolute top-4 right-4 text-gray-500 hover:text-white">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+                <h2 class="text-3xl font-black text-center gradient-text">Micro-Lesson</h2>
+                <p class="text-center text-gray-400 mt-2">What do you want to learn about in 5 minutes?</p>
+                
+                <div class="mt-8">
+                    <input id="learning-topic-input" type="text" placeholder="e.g., The basics of black holes" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-pink-500">
+                    <button id="generate-lesson-btn" class="w-full mt-4 p-3 gradient-accent rounded-lg font-bold">✨ Generate Lesson</button>
+                </div>
+
+                <div id="learning-loader" class="hidden text-center p-4 mt-4 text-gray-400">
+                    <p>Generating your lesson...</p>
+                </div>
+
+                <div id="learning-results" class="hidden mt-6 text-left max-h-72 overflow-y-auto">
+                    <!-- Generated lesson will appear here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Finance Analysis Modal -->
+        <div id="finance-analysis-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
+            <div class="card rounded-2xl w-full max-w-md p-6 relative animate-fade-in-up">
+                <button id="close-finance-modal" class="absolute top-4 right-4 text-gray-500 hover:text-white">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+                <h2 class="text-3xl font-black text-center gradient-text">Analyze Your Spending</h2>
+                <p class="text-center text-gray-400 mt-2">Paste your recent expenses below.</p>
+                
+                <div class="mt-8">
+                    <textarea id="finance-input" rows="4" placeholder="Coffee: $5&#10;Groceries: $75&#10;Netflix: $15&#10;Gas: $40" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-pink-500 text-sm"></textarea>
+                    <button id="generate-finance-insight-btn" class="w-full mt-4 p-3 gradient-accent rounded-lg font-bold">✨ Get Financial Insight</button>
+                </div>
+
+                <div id="finance-loader" class="hidden text-center p-4 mt-4 text-gray-400">
+                    <p>Analyzing your expenses...</p>
+                </div>
+
+                <div id="finance-results" class="hidden mt-6 space-y-4 text-left max-h-72 overflow-y-auto">
+                    <!-- Generated finance insights will appear here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Modal (Premium) -->
+        <div id="analytics-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
+            <div class="card rounded-2xl w-full max-w-md p-6 relative animate-fade-in-up">
+                <button id="close-analytics-modal" class="absolute top-4 right-4 text-gray-500 hover:text-white">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+                <h2 class="text-3xl font-black text-center gradient-text">Your Analytics</h2>
+                <p class="text-center text-gray-400 mt-2">A look at your epic progress.</p>
+                
+                <div class="mt-8 space-y-6">
+                    <div>
+                        <h3 class="font-semibold mb-2">XP Gained (Last 7 Days)</h3>
+                        <div class="card p-3 rounded-lg bg-gray-900 h-32 flex items-end gap-2">
+                             <!-- Fake bar chart -->
+                            <div class="w-full h-1/4 rounded-t-sm bg-teal-500"></div>
+                            <div class="w-full h-1/2 rounded-t-sm bg-teal-500"></div>
+                            <div class="w-full h-1/3 rounded-t-sm bg-teal-500"></div>
+                            <div class="w-full h-3/4 rounded-t-sm bg-teal-500"></div>
+                            <div class="w-full h-2/3 rounded-t-sm bg-teal-500"></div>
+                            <div class="w-full h-full rounded-t-sm bg-teal-500"></div>
+                            <div class="w-full h-1/2 rounded-t-sm bg-teal-500"></div>
+                        </div>
+                    </div>
+                     <div>
+                        <h3 class="font-semibold mb-2">Quest Completion Rate</h3>
+                        <div class="w-full bg-gray-900 rounded-full h-4">
+                          <div class="bg-indigo-500 h-4 rounded-full" style="width: 75%"></div>
+                        </div>
+                        <p class="text-right text-sm mt-1 font-bold">75%</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Avatar Customization Modal (Premium) -->
+        <div id="avatar-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
+            <div class="card rounded-2xl w-full max-w-md p-6 relative animate-fade-in-up">
+                <button id="close-avatar-modal" class="absolute top-4 right-4 text-gray-500 hover:text-white">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+                <h2 class="text-3xl font-black text-center gradient-text">Choose Your Avatar</h2>
+                <p class="text-center text-gray-400 mt-2">Define your adventurer's look.</p>
+                
+                <div class="mt-8 grid grid-cols-4 gap-4">
+                    <img src="https://placehold.co/80x80/14b8a6/ffffff?text=A" alt="Avatar" class="rounded-full cursor-pointer ring-2 ring-teal-500">
+                    <img src="https://placehold.co/80x80/6366f1/ffffff?text=B" alt="Avatar" class="rounded-full cursor-pointer opacity-70 hover:opacity-100">
+                    <img src="https://placehold.co/80x80/ec4899/ffffff?text=C" alt="Avatar" class="rounded-full cursor-pointer opacity-70 hover:opacity-100">
+                    <div class="relative">
+                         <img src="https://placehold.co/80x80/f59e0b/ffffff?text=D" alt="Avatar" class="rounded-full cursor-pointer">
+                         <div class="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center"><i data-lucide="lock" class="w-6 h-6 text-yellow-400"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Group Quest Modal (Premium) -->
+        <div id="group-quest-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
+            <div class="card rounded-2xl w-full max-w-md p-6 relative animate-fade-in-up">
+                <button id="close-group-quest-modal" class="absolute top-4 right-4 text-gray-500 hover:text-white">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+                <h2 class="text-3xl font-black text-center gradient-text">Start a Group Quest</h2>
+                <p class="text-center text-gray-400 mt-2">Team up for epic rewards!</p>
+                
+                 <div class="mt-8">
+                    <label class="text-sm font-semibold text-gray-400">Quest Name</label>
+                    <input type="text" placeholder="e.g., Weekly Fitness Challenge" class="w-full mt-1 bg-gray-800 border border-gray-700 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-pink-500">
+                    <button class="w-full mt-4 p-3 gradient-accent rounded-lg font-bold">✨ Create & Get Invite Code</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Scan Modal -->
+        <div id="scan-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
+            <div class="card rounded-2xl w-full max-w-md p-6 relative animate-fade-in-up">
+                <button id="close-scan-modal" class="absolute top-4 right-4 text-gray-500 hover:text-white">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+                <h2 class="text-3xl font-black text-center gradient-text">Scan Document</h2>
+                <p class="text-center text-gray-400 mt-2">Point your camera at a receipt, document, or page.</p>
+                
+                 <div class="mt-8 w-full h-64 bg-gray-900 rounded-lg flex items-center justify-center">
+                    <p class="text-gray-500">[Camera View Placeholder]</p>
+                 </div>
+                 <button class="w-full mt-4 p-3 gradient-accent rounded-lg font-bold flex items-center justify-center gap-2">
+                    <i data-lucide="camera" class="w-5 h-5"></i>
+                    <span>Capture</span>
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+
+            // --- App State ---
+            let isPremium = false; // User is on the free plan by default
+            let dailyQuests = [
+                { icon: 'walk', color: 'text-blue-400', title: 'Morning Stroll', description: 'Walk 2,000 steps', xp: 25, coins: 10 },
+                { icon: 'book-open', color: 'text-pink-400', title: 'Knowledge Nibble', description: 'Read an article for 5 mins', xp: 20, coins: 5 }
+            ];
+
+            // --- Gemini API ---
+            /**
+             * Calls the Gemini API to generate content.
+             * @param {string} userQuery The user's prompt.
+             * @param {object} [systemInstruction] Optional system instruction object.
+             * @param {object} [generationConfig] Optional generation config for structured responses.
+             * @returns {Promise<object>} A promise that resolves with the parsed AI's response.
+             */
+            async function callGeminiAPI(userQuery, systemInstruction = null, generationConfig = null) {
+                const apiKey = "AIzaSyAVsgP4wvcrkhZchKlv3-5WJEqGW_i-fmU"; // In a real app, this would be handled securely. Left blank for this environment.
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+                const payload = {
+                    contents: [{ parts: [{ text: userQuery }] }],
+                };
+
+                if (systemInstruction) {
+                    payload.systemInstruction = systemInstruction;
+                }
+                if (generationConfig) {
+                    payload.generationConfig = generationConfig;
+                }
+
+                console.log("--- Calling Gemini API ---");
+                console.log("Payload:", JSON.stringify(payload, null, 2));
+
+                // This is a mocked response for demonstration in an environment without a real API key.
+                // In a live environment, the fetch call below would be used.
+                return mockGeminiResponse(userQuery, generationConfig);
+
+                /*
+                // REAL API CALL (commented out for this environment)
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`API call failed with status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    const candidate = result.candidates?.[0];
+
+                    if (candidate && candidate.content?.parts?.[0]?.text) {
+                        return JSON.parse(candidate.content.parts[0].text);
+                    } else {
+                        throw new Error("Invalid response structure from API.");
+                    }
+                } catch (error) {
+                    console.error("Gemini API Error:", error);
+                    throw error; // Re-throw the error to be handled by the caller
+                }
+                */
+            }
+            
+            /**
+             * Mocks the Gemini API response for demonstration purposes.
+             */
+            async function mockGeminiResponse(userQuery, generationConfig) {
+                 await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate network delay
+
+                if (generationConfig && generationConfig.responseMimeType === 'application/json') {
+                    if (userQuery.includes("generate new daily quests")) {
+                        return [
+                           { icon: 'zap', color: 'text-yellow-400', title: 'Quick Sprint', description: 'Do a 1-minute plank', xp: 30, coins: 15 },
+                           { icon: 'message-square', color: 'text-green-400', title: 'Social Connect', description: 'Message a friend you haven\'t spoken to', xp: 35, coins: 20 },
+                           { icon: 'trash-2', color: 'text-purple-400', title: 'Tidy Up', description: 'Declutter one small area for 5 minutes', xp: 20, coins: 10 }
+                       ];
+                    }
+                    if (userQuery.startsWith("Break down this goal:")) {
+                        return [
+                            { title: "Research recipes", description: "Find 3 interesting recipes online." },
+                            { title: "Shop for ingredients", description: "Create a list and buy all needed items." },
+                            { title: "Prep the ingredients", description: "Wash, chop, and measure everything." },
+                            { title: "Follow the recipe", description: "Cook your first amazing meal!" }
+                        ];
+                    }
+                    if (userQuery.startsWith("Analyze this journal entry:")) {
+                        return {
+                            summary: "It sounds like you had a really effective day, balancing productivity with self-awareness about your energy levels. That's a great skill!",
+                            win: "Pushing through your workout even when you felt tired is a huge accomplishment. That shows real dedication!",
+                            suggested_quest: {
+                                title: "Mindful Break",
+                                description: "Schedule a 10-minute break in the afternoon to just relax, stretch, or meditate."
+                            }
+                        };
+                    }
+                    if (userQuery.startsWith("Generate a micro-lesson about:")) {
+                        return {
+                            title: "Black Holes: Gravity's Ultimate Mystery",
+                            content: "Imagine an object so massive and dense that nothing, not even light, can escape its gravitational pull. That's a black hole! They form when giant stars collapse under their own weight.\n\nAt the center is a 'singularity,' a point of infinite density. While you can't see a black hole directly, scientists can detect them by observing their powerful effects on nearby stars and gas. They are one of the most fascinating and mysterious objects in the universe!"
+                        };
+                    }
+                     if (userQuery.startsWith("Analyze these expenses:")) {
+                        return {
+                            categorized_expenses: [
+                                { expense: "Coffee", category: "Food & Drink" },
+                                { expense: "Groceries", category: "Groceries" },
+                                { expense: "Netflix", category: "Entertainment" },
+                                { expense: "Gas", category: "Transportation" }
+                            ],
+                            summary: "Your main spending categories this week are Groceries and Transportation.",
+                            tip: "Making coffee at home is a simple way to save a little extra each week. It adds up!"
+                        };
+                    }
+                }
+                
+                // Default text responses
+                const lowerCaseQuery = userQuery.toLowerCase();
+                if (lowerCaseQuery.includes("hello") || lowerCaseQuery.includes("hi")) {
+                    return { text: "Hey there! Ready to conquer your day? What's our first mission? 🚀" };
+                }
+                return { text: "That's an interesting goal! Let's break it down. What's one tiny thing you could do in the next 10 minutes to move towards it?" };
+            }
+
+
+            // --- UI Elements ---
+            const mainApp = document.getElementById('main-app');
+            const navItems = document.querySelectorAll('.nav-item');
+            const contentScreens = {
+                'home-screen': document.getElementById('home-screen-content'),
+                'chat-screen': document.getElementById('chat-screen-content'),
+                'modules-screen': document.getElementById('modules-screen-content'),
+                'profile-screen': document.getElementById('profile-screen-content'),
+            };
+
+            // --- Daily Quests Elements & Logic ---
+            const questsList = document.getElementById('daily-quests-list');
+            const generateQuestsBtn = document.getElementById('generate-quests-btn');
+            const questsLoader = document.getElementById('quests-loader');
+
+            function renderQuests() {
+                questsList.innerHTML = '';
+                if (!dailyQuests || dailyQuests.length === 0) return;
+                dailyQuests.forEach(quest => {
+                    const questEl = document.createElement('div');
+                    questEl.className = 'flex items-center justify-between p-3 bg-gray-900 rounded-lg chat-bubble';
+                    questEl.innerHTML = `
+                        <div class="flex items-center">
+                            <i data-lucide="${quest.icon}" class="w-6 h-6 mr-3 ${quest.color}"></i>
+                            <div>
+                                <p class="font-medium">${quest.title}</p>
+                                <p class="text-xs text-gray-400">${quest.description}</p>
+                            </div>
+                        </div>
+                        <p class="font-bold text-sm">+${quest.xp} XP | +${quest.coins} 🪙</p>
+                    `;
+                    questsList.appendChild(questEl);
+                });
+                lucide.createIcons();
+            }
+
+            generateQuestsBtn.addEventListener('click', async () => {
+                questsList.innerHTML = '';
+                questsLoader.classList.remove('hidden');
+                
+                const systemInstruction = { parts: [{ text: "You are a fun, gamified life coach AI. Generate a JSON array of 3 new, unique, and actionable daily quests." }] };
+                const userQuery = "Please generate new daily quests for me.";
+                const generationConfig = {
+                  responseMimeType: "application/json",
+                  responseSchema: {
+                    type: "ARRAY",
+                    items: {
+                      type: "OBJECT",
+                      properties: {
+                        icon: { type: "STRING" },
+                        color: { type: "STRING" },
+                        title: { type: "STRING" },
+                        description: { type: "STRING" },
+                        xp: { type: "NUMBER" },
+                        coins: { type: "NUMBER" },
+                      },
+                    },
+                  },
+                };
+
+                try {
+                    const response = await callGeminiAPI(userQuery, systemInstruction, generationConfig);
+                    dailyQuests = response;
+                    renderQuests();
+                } catch (error) {
+                    console.error("Failed to generate quests:", error);
+                } finally {
+                    questsLoader.classList.add('hidden');
+                }
+            });
+
+            // --- Goal Breakdown Logic ---
+            const goalModal = document.getElementById('goal-breakdown-modal');
+            const breakdownBtn = document.getElementById('breakdown-goal-btn');
+            const closeGoalBtn = document.getElementById('close-goal-modal');
+            const goalInput = document.getElementById('goal-input');
+            const generateTasksBtn = document.getElementById('generate-tasks-btn');
+            const taskResultsList = document.getElementById('task-results-list');
+            const goalLoader = document.getElementById('goal-loader');
+
+            breakdownBtn.addEventListener('click', () => goalModal.classList.remove('hidden'));
+            closeGoalBtn.addEventListener('click', () => goalModal.classList.add('hidden'));
+
+            generateTasksBtn.addEventListener('click', async () => {
+                const goal = goalInput.value.trim();
+                if (!goal) return;
+
+                taskResultsList.innerHTML = '';
+                goalLoader.classList.remove('hidden');
+                generateTasksBtn.disabled = true;
+
+                const systemInstruction = { parts: [{ text: "You are a productivity AI that breaks large user goals into a JSON array of small, actionable tasks. Each task should be an object with 'title' and 'description'." }] };
+                const userQuery = `Break down this goal: "${goal}"`;
+                const generationConfig = {
+                  responseMimeType: "application/json",
+                  responseSchema: {
+                    type: "ARRAY",
+                    items: {
+                      type: "OBJECT",
+                      properties: {
+                        title: { type: "STRING" },
+                        description: { type: "STRING" },
+                      },
+                    },
+                  },
+                };
+                
+                try {
+                    const tasks = await callGeminiAPI(userQuery, systemInstruction, generationConfig);
+                    renderGeneratedTasks(tasks);
+                } catch (error) {
+                    console.error("Failed to break down goal:", error);
+                    taskResultsList.innerHTML = `<p class="text-red-400 text-center">Could not generate quests. Please try again.</p>`;
+                } finally {
+                    goalLoader.classList.add('hidden');
+                    generateTasksBtn.disabled = false;
+                }
+            });
+
+            function renderGeneratedTasks(tasks) {
+                taskResultsList.innerHTML = '';
+                if (!tasks || tasks.length === 0) return;
+                tasks.forEach(task => {
+                    const taskEl = document.createElement('div');
+                    taskEl.className = 'flex items-center justify-between p-3 bg-gray-900 rounded-lg chat-bubble';
+                    taskEl.innerHTML = `
+                        <div>
+                            <p class="font-medium">${task.title}</p>
+                            <p class="text-xs text-gray-400">${task.description}</p>
+                        </div>
+                        <button class="text-sm gradient-text font-semibold hover:opacity-80 transition-opacity">Add</button>
+                    `;
+                    taskResultsList.appendChild(taskEl);
+                });
+            }
+
+
+            // --- Daily Reflection Logic ---
+            const reflectionModal = document.getElementById('reflection-modal');
+            const openReflectionBtn = document.getElementById('open-reflection-btn');
+            const closeReflectionModalBtn = document.getElementById('close-reflection-modal');
+            const reflectionInput = document.getElementById('reflection-input');
+            const generateReflectionBtn = document.getElementById('generate-reflection-btn');
+            const reflectionLoader = document.getElementById('reflection-loader');
+            const reflectionResults = document.getElementById('reflection-results');
+
+            openReflectionBtn.addEventListener('click', () => reflectionModal.classList.remove('hidden'));
+            closeReflectionModalBtn.addEventListener('click', () => reflectionModal.classList.add('hidden'));
+            
+            generateReflectionBtn.addEventListener('click', async () => {
+                const entry = reflectionInput.value.trim();
+                if (!entry) return;
+
+                reflectionResults.classList.add('hidden');
+                reflectionLoader.classList.remove('hidden');
+                generateReflectionBtn.disabled = true;
+
+                const systemInstruction = { parts: [{ text: "You are a supportive and insightful AI coach. Analyze the user's journal entry and respond in a JSON object format with three keys: 'summary' (a brief, encouraging summary of their day), 'win' (identify one positive accomplishment or 'win'), and 'suggested_quest' (an object with a 'title' and 'description' for a simple, relevant task for tomorrow)." }] };
+                const userQuery = `Analyze this journal entry: "${entry}"`;
+                const generationConfig = {
+                  responseMimeType: "application/json",
+                  responseSchema: {
+                    type: "OBJECT",
+                    properties: {
+                      summary: { type: "STRING" },
+                      win: { type: "STRING" },
+                      suggested_quest: {
+                        type: "OBJECT",
+                        properties: {
+                          title: { type: "STRING" },
+                          description: { type: "STRING" },
+                        },
+                      },
+                    },
+                  },
+                };
+
+                try {
+                    const insight = await callGeminiAPI(userQuery, systemInstruction, generationConfig);
+                    renderReflectionResults(insight);
+                } catch (error) {
+                    console.error("Failed to generate reflection:", error);
+                    reflectionResults.innerHTML = `<p class="text-red-400 text-center">Could not get insights. Please try again.</p>`;
+                    reflectionResults.classList.remove('hidden');
+                } finally {
+                    reflectionLoader.classList.add('hidden');
+                    generateReflectionBtn.disabled = false;
+                }
+            });
+
+            function renderReflectionResults(insight) {
+                if (!insight) return;
+                reflectionResults.innerHTML = `
+                    <div>
+                        <h4 class="font-semibold gradient-text">Summary of Your Day</h4>
+                        <p class="text-sm text-gray-300 mt-1">${insight.summary}</p>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold gradient-text">Today's Epic Win! 🏆</h4>
+                        <p class="text-sm text-gray-300 mt-1">${insight.win}</p>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold gradient-text">A Quest for Tomorrow</h4>
+                        <div class="flex items-center justify-between p-3 mt-1 bg-gray-900 rounded-lg">
+                            <div>
+                                <p class="font-medium">${insight.suggested_quest.title}</p>
+                                <p class="text-xs text-gray-400">${insight.suggested_quest.description}</p>
+                            </div>
+                            <button class="text-sm gradient-text font-semibold hover:opacity-80 transition-opacity">Add</button>
+                        </div>
+                    </div>
+                `;
+                reflectionResults.classList.remove('hidden');
+            }
+
+
+            // --- AI Learning Logic ---
+            const learningModal = document.getElementById('learning-modal');
+            const openLearningBtn = document.getElementById('open-learning-btn');
+            const closeLearningModalBtn = document.getElementById('close-learning-modal');
+            const learningTopicInput = document.getElementById('learning-topic-input');
+            const generateLessonBtn = document.getElementById('generate-lesson-btn');
+            const learningLoader = document.getElementById('learning-loader');
+            const learningResults = document.getElementById('learning-results');
+
+            openLearningBtn.addEventListener('click', () => learningModal.classList.remove('hidden'));
+            closeLearningModalBtn.addEventListener('click', () => learningModal.classList.add('hidden'));
+
+            generateLessonBtn.addEventListener('click', async () => {
+                const topic = learningTopicInput.value.trim();
+                if (!topic) return;
+
+                learningResults.classList.add('hidden');
+                learningLoader.classList.remove('hidden');
+                generateLessonBtn.disabled = true;
+
+                const systemInstruction = { parts: [{ text: "You are an AI tutor that creates engaging, bite-sized micro-lessons (under 150 words) on any topic. Respond in a JSON object format with two keys: 'title' (a catchy title for the lesson) and 'content' (the lesson text, using newline characters for paragraphs). Make the content easy to understand for a general audience." }] };
+                const userQuery = `Generate a micro-lesson about: "${topic}"`;
+                const generationConfig = {
+                  responseMimeType: "application/json",
+                  responseSchema: {
+                    type: "OBJECT",
+                    properties: {
+                      title: { type: "STRING" },
+                      content: { type: "STRING" },
+                    },
+                  },
+                };
+
+                try {
+                    const lesson = await callGeminiAPI(userQuery, systemInstruction, generationConfig);
+                    renderMicroLesson(lesson);
+                } catch (error) {
+                    console.error("Failed to generate lesson:", error);
+                    learningResults.innerHTML = `<p class="text-red-400 text-center">Could not generate lesson. Please try again.</p>`;
+                    learningResults.classList.remove('hidden');
+                } finally {
+                    learningLoader.classList.add('hidden');
+                    generateLessonBtn.disabled = false;
+                }
+            });
+
+            function renderMicroLesson(lesson) {
+                if (!lesson) return;
+                const formattedContent = lesson.content.replace(/\n/g, '<br><br>');
+                learningResults.innerHTML = `
+                    <h3 class="text-xl font-bold gradient-text mb-3">${lesson.title}</h3>
+                    <p class="text-sm text-gray-300 leading-relaxed">${formattedContent}</p>
+                    <button class="w-full text-center mt-4 text-sm bg-gray-800 text-white font-semibold py-2 px-3 rounded-md hover:bg-gray-700 transition-colors">Mark as Complete (+15 XP)</button>
+                `;
+                learningResults.classList.remove('hidden');
+            }
+            
+            // --- AI Finance Logic ---
+            const financeModal = document.getElementById('finance-analysis-modal');
+            const openFinanceBtn = document.getElementById('open-finance-btn');
+            const closeFinanceModalBtn = document.getElementById('close-finance-modal');
+            const financeInput = document.getElementById('finance-input');
+            const generateFinanceInsightBtn = document.getElementById('generate-finance-insight-btn');
+            const financeLoader = document.getElementById('finance-loader');
+            const financeResults = document.getElementById('finance-results');
+
+            openFinanceBtn.addEventListener('click', () => financeModal.classList.remove('hidden'));
+            closeFinanceModalBtn.addEventListener('click', () => financeModal.classList.add('hidden'));
+
+            generateFinanceInsightBtn.addEventListener('click', async () => {
+                const expenses = financeInput.value.trim();
+                if (!expenses) return;
+
+                financeResults.classList.add('hidden');
+                financeLoader.classList.remove('hidden');
+                generateFinanceInsightBtn.disabled = true;
+
+                const systemInstruction = { parts: [{ text: "You are an expert financial advisor AI. Analyze the user's list of expenses. Categorize each expense and provide a brief summary and one actionable saving tip. Respond in a JSON object format." }] };
+                const userQuery = `Analyze these expenses:\n${expenses}`;
+                const generationConfig = {
+                  responseMimeType: "application/json",
+                  responseSchema: {
+                    type: "OBJECT",
+                    properties: {
+                      categorized_expenses: {
+                        type: "ARRAY",
+                        items: {
+                          type: "OBJECT",
+                          properties: {
+                            expense: { type: "STRING" },
+                            category: { type: "STRING" }
+                          }
+                        }
+                      },
+                      summary: { type: "STRING" },
+                      tip: { type: "STRING" }
+                    }
+                  }
+                };
+
+                try {
+                    const insight = await callGeminiAPI(userQuery, systemInstruction, generationConfig);
+                    renderFinanceAnalysis(insight);
+                } catch (error) {
+                    console.error("Failed to generate finance insight:", error);
+                    financeResults.innerHTML = `<p class="text-red-400 text-center">Could not analyze expenses. Please try again.</p>`;
+                    financeResults.classList.remove('hidden');
+                } finally {
+                    financeLoader.classList.add('hidden');
+                    generateFinanceInsightBtn.disabled = false;
+                }
+            });
+
+            function renderFinanceAnalysis(insight) {
+                if (!insight) return;
+
+                let categoriesHTML = insight.categorized_expenses.map(item => `
+                    <div class="flex justify-between items-center text-sm p-2 bg-gray-900 rounded-md">
+                        <span>${item.expense}</span>
+                        <span class="font-semibold text-gray-400">${item.category}</span>
+                    </div>
+                `).join('');
+
+                financeResults.innerHTML = `
+                    <div>
+                        <h4 class="font-semibold gradient-text">Expense Categories</h4>
+                        <div class="mt-2 space-y-1">${categoriesHTML}</div>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold gradient-text">AI Summary</h4>
+                        <p class="text-sm text-gray-300 mt-1">${insight.summary}</p>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold gradient-text">Savings Tip 💡</h4>
+                        <p class="text-sm text-gray-300 mt-1">${insight.tip}</p>
+                    </div>
+                `;
+                financeResults.classList.remove('hidden');
+            }
+
+            // --- Premium Features Logic ---
+            const premiumModal = document.getElementById('premium-modal');
+            const analyticsModal = document.getElementById('analytics-modal');
+            const avatarModal = document.getElementById('avatar-modal');
+            const groupQuestModal = document.getElementById('group-quest-modal');
+            
+            const upgradePremiumBtn = document.getElementById('upgrade-premium-btn');
+            const closePremiumModalBtn = document.getElementById('close-premium-modal');
+            const closeAnalyticsModalBtn = document.getElementById('close-analytics-modal');
+            const closeAvatarModalBtn = document.getElementById('close-avatar-modal');
+            const closeGroupQuestModalBtn = document.getElementById('close-group-quest-modal');
+
+            const analyticsBtn = document.getElementById('analytics-btn');
+            const avatarBtn = document.getElementById('avatar-btn');
+            const openGroupQuestBtn = document.getElementById('open-group-quest-btn');
+            const devUnlockPremiumBtn = document.getElementById('dev-unlock-premium');
+            
+            function handlePremiumFeatureClick(modal) {
+                if(isPremium) {
+                    modal.classList.remove('hidden');
+                } else {
+                    premiumModal.classList.remove('hidden');
+                }
+            }
+
+            analyticsBtn.addEventListener('click', (e) => { e.preventDefault(); handlePremiumFeatureClick(analyticsModal); });
+            avatarBtn.addEventListener('click', (e) => { e.preventDefault(); handlePremiumFeatureClick(avatarModal); });
+            openGroupQuestBtn.addEventListener('click', (e) => { e.preventDefault(); handlePremiumFeatureClick(groupQuestModal); });
+
+            upgradePremiumBtn.addEventListener('click', () => premiumModal.classList.remove('hidden'));
+            closePremiumModalBtn.addEventListener('click', () => premiumModal.classList.add('hidden'));
+            closeAnalyticsModalBtn.addEventListener('click', () => analyticsModal.classList.add('hidden'));
+            closeAvatarModalBtn.addEventListener('click', () => avatarModal.classList.add('hidden'));
+            closeGroupQuestModalBtn.addEventListener('click', () => groupQuestModal.classList.add('hidden'));
+
+            function updatePremiumUI() {
+                const premiumSections = document.querySelectorAll('.premium-locked');
+                if (isPremium) {
+                    premiumSections.forEach(el => el.classList.remove('premium-locked'));
+                    upgradePremiumBtn.classList.add('hidden');
+                } else {
+                    premiumSections.forEach(el => el.classList.add('premium-locked'));
+                    upgradePremiumBtn.classList.remove('hidden');
+                }
+                lucide.createIcons();
+            }
+
+            devUnlockPremiumBtn.addEventListener('click', () => {
+                isPremium = !isPremium;
+                updatePremiumUI();
+                premiumModal.classList.add('hidden');
+            });
+            
+            // --- FAB (Floating Action Button) Logic ---
+            const fabContainer = document.getElementById('fab-container');
+            const fabToggleBtn = document.getElementById('fab-toggle-btn');
+            const scanFabBtn = document.getElementById('scan-fab-btn');
+            const scanModal = document.getElementById('scan-modal');
+            const closeScanModalBtn = document.getElementById('close-scan-modal');
+            const fabNewGoalBtn = document.getElementById('fab-new-goal');
+
+            fabToggleBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                fabContainer.classList.toggle('fab-menu-open');
+                if (fabContainer.classList.contains('fab-menu-open')) {
+                    fabToggleBtn.innerHTML = '<i data-lucide="x" class="w-8 h-8 transition-transform duration-300"></i>';
+                    fabToggleBtn.classList.add('rotate-45');
+                } else {
+                    fabToggleBtn.innerHTML = '<i data-lucide="plus" class="w-8 h-8 transition-transform duration-300"></i>';
+                    fabToggleBtn.classList.remove('rotate-45');
+                }
+                lucide.createIcons();
+            });
+
+            scanFabBtn.addEventListener('click', () => scanModal.classList.remove('hidden'));
+            closeScanModalBtn.addEventListener('click', () => scanModal.classList.add('hidden'));
+            
+            fabNewGoalBtn.addEventListener('click', () => {
+                goalModal.classList.remove('hidden');
+                fabContainer.classList.remove('fab-menu-open'); // Close menu after action
+                fabToggleBtn.innerHTML = '<i data-lucide="plus" class="w-8 h-8 transition-transform duration-300"></i>';
+                fabToggleBtn.classList.remove('rotate-45');
+                lucide.createIcons();
+            });
+            
+            // Close FAB menu when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!fabContainer.contains(e.target) && fabContainer.classList.contains('fab-menu-open')) {
+                    fabContainer.classList.remove('fab-menu-open');
+                    fabToggleBtn.innerHTML = '<i data-lucide="plus" class="w-8 h-8 transition-transform duration-300"></i>';
+                    fabToggleBtn.classList.remove('rotate-45');
+                    lucide.createIcons();
+                }
+            });
+
+
+            // --- Chat Elements & Logic ---
+            const chatMessages = document.getElementById('chat-messages');
+            const chatInput = document.getElementById('chat-input');
+            const sendChatBtn = document.getElementById('send-chat-btn');
+
+            function addMessageToChat(message, from) {
+                const messageWrapper = document.createElement('div');
+                messageWrapper.className = `flex items-start gap-3 chat-bubble ${from === 'user' ? 'justify-end' : ''}`;
+                
+                let bubbleHTML = '';
+                if (from === 'ai') {
+                    bubbleHTML = `
+                        <div class="w-8 h-8 rounded-full gradient-accent flex items-center justify-center font-bold text-sm flex-shrink-0">VQ</div>
+                        <div class="bg-gray-800 p-3 rounded-lg max-w-xs md:max-w-md">
+                            <p>${message}</p>
+                        </div>
+                    `;
+                } else { // user
+                     bubbleHTML = `
+                        <div class="bg-indigo-600 p-3 rounded-lg max-w-xs md:max-w-md">
+                            <p>${message}</p>
+                        </div>
+                        <img src="https://placehold.co/32x32/14b8a6/ffffff?text=A" id="chat-avatar-img" alt="Avatar" class="w-8 h-8 rounded-full border-2 border-teal-500 flex-shrink-0">
+                    `;
+                }
+                messageWrapper.innerHTML = bubbleHTML;
+                chatMessages.appendChild(messageWrapper);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            function showTypingIndicator() {
+                const typingIndicator = document.createElement('div');
+                typingIndicator.id = 'typing-indicator';
+                typingIndicator.className = 'flex items-start gap-3 chat-bubble';
+                typingIndicator.innerHTML = `
+                    <div class="w-8 h-8 rounded-full gradient-accent flex items-center justify-center font-bold text-sm flex-shrink-0">VQ</div>
+                    <div class="bg-gray-800 p-3 rounded-lg flex items-center gap-1.5">
+                        <span class="w-2 h-2 bg-gray-400 rounded-full typing-dot"></span>
+                        <span class="w-2 h-2 bg-gray-400 rounded-full typing-dot"></span>
+                        <span class="w-2 h-2 bg-gray-400 rounded-full typing-dot"></span>
+                    </div>
+                `;
+                chatMessages.appendChild(typingIndicator);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            function removeTypingIndicator() {
+                const indicator = document.getElementById('typing-indicator');
+                if (indicator) indicator.remove();
+            }
+
+            async function handleSendMessage() {
+                const message = chatInput.value.trim();
+                if (!message) return;
+
+                addMessageToChat(message, 'user');
+                chatInput.value = '';
+                showTypingIndicator();
+
+                const systemInstruction = { parts: [{ text: "You are Vaulty, a friendly and motivating AI game master and life coach. Your goal is to help users 'level up' their lives by providing supportive, actionable, and encouraging advice. Keep responses concise, positive, and use a friendly, gamified tone with emojis. ✨" }] };
+                
+                try {
+                    const response = await callGeminiAPI(message, systemInstruction);
+                    addMessageToChat(response.text, 'ai');
+                } catch(error) {
+                    addMessageToChat("Oops! My circuits are a bit fuzzy right now. Please try again in a moment.", 'ai');
+                    console.error("Chat API error:", error);
+                } finally {
+                    removeTypingIndicator();
+                }
+            }
+            
+            sendChatBtn.addEventListener('click', handleSendMessage);
+            chatInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleSendMessage();
+                }
+            });
+
+
+            // --- Navigation Logic ---
+            function switchTab(targetId) {
+                navItems.forEach(item => {
+                    item.classList.toggle('nav-active', item.dataset.target === targetId);
+                });
+                Object.values(contentScreens).forEach(screen => screen.classList.add('hidden'));
+                if (contentScreens[targetId]) {
+                    contentScreens[targetId].classList.remove('hidden');
+                    document.getElementById('main-content').scrollTop = 0;
+                }
+            }
+
+            navItems.forEach(item => {
+                item.addEventListener('click', () => switchTab(item.dataset.target));
+            });
+            
+            // --- Initial App Load ---
+            function initializeApp() {
+                switchTab('home-screen');
+                renderQuests();
+                updatePremiumUI();
+            }
+
+            initializeApp();
+        });
+    </script>
+</body>
+</html>
+
