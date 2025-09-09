@@ -1,1291 +1,1218 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vaulty Quest - Gamify Your Life</title>
+    <title>Auto Assistant - AI Car Finder</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #0a0a0a; /* Slightly darker black */
-            color: #e5e7eb; /* Off-white for softer text */
-            -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
-        .gradient-accent {
-            background-image: linear-gradient(to right, #14b8a6, #6366f1); /* Teal to Indigo */
+
+        .animated-gradient {
+            background: linear-gradient(-45deg, #00d4ff, #e81cff, #8f00ff, #ff00c8);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
         }
-        .gradient-text {
-            background-image: linear-gradient(to right, #5eead4, #818cf8); /* Lighter Teal to Lighter Indigo */
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            color: transparent;
-        }
-        .nav-active {
-            color: #5eead4; /* Teal Accent */
-        }
-        .progress-bar-fill {
-            background-image: linear-gradient(to right, #14b8a6, #8b5cf6); /* Teal to Violet */
-            transition: width 0.5s ease-in-out;
-        }
-        .card {
-            background-color: #1f2937; /* gray-800 */
-            border: 1px solid #374151; /* gray-700 */
-            transition: border-color 0.3s ease;
-        }
-        /* Custom scrollbar for better dark mode aesthetics */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #111827; /* gray-900 */
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #374151; /* gray-700 */
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #4b5563; /* gray-600 */
-        }
-        /* Hide scrollbar for onboarding slides */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none; /* IE and Edge */
-            scrollbar-width: none; /* Firefox */
-        }
-         /* Animation for modals and chat bubbles */
-        @keyframes fade-in-up {
-            from { opacity: 0; transform: translateY(20px) scale(0.98); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        .animate-fade-in-up {
-            animation: fade-in-up 0.3s ease-out forwards;
-        }
-        .chat-bubble {
-            animation: fade-in-up 0.3s ease-out forwards;
-        }
-        /* Typing indicator animation */
-        .typing-dot {
-            animation: typing-blink 1.4s infinite both;
-        }
-        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
-        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
-        @keyframes typing-blink {
-            0% { opacity: 0.2; }
-            20% { opacity: 1; }
-            100% { opacity: 0.2; }
-        }
-        .premium-lock-icon {
-            display: none;
-        }
-        .premium-locked .premium-lock-icon {
-            display: inline-block;
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
         
-        /* FAB Menu Styles */
-        .fab-menu-item {
-            transition: all 0.3s ease-out;
-            opacity: 0;
-            transform: translateY(20px);
-            pointer-events: none;
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .nav-item:hover,
+        .nav-item.active { color: #e81cff; }
+        
+        .page { display: none; }
+        .page.active { display: block; }
+
+        select:disabled, button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
-        .fab-menu-open .fab-menu-item {
-            opacity: 1;
-            transform: translateY(0);
-            pointer-events: auto;
+        .gradient-border {
+            position: relative;
+            padding: 1px; /* Border width */
+            background: linear-gradient(-45deg, #00d4ff, #e81cff, #8f00ff, #ff00c8);
+            border-radius: 0.625rem; /* Slightly larger than inner rounded-lg */
         }
-        .fab-menu-open .fab-menu-item:nth-child(1) { transition-delay: 0.1s; }
-        .fab-menu-open .fab-menu-item:nth-child(2) { transition-delay: 0.2s; }
-        .fab-menu-open .fab-menu-item:nth-child(3) { transition-delay: 0.3s; }
     </style>
 </head>
-<body class="overscroll-none">
+<body class="bg-gray-100 dark:bg-gray-900">
 
-    <div id="app-container" class="h-screen w-screen overflow-hidden">
+    <div class="w-screen h-screen bg-white dark:bg-black text-gray-900 dark:text-white flex flex-col">
 
-        <!-- Splash Screen (Now Hidden) -->
-        <div id="splash-screen" class="hidden absolute inset-0 bg-black flex flex-col items-center justify-center z-50 transition-opacity duration-500">
-            <div class="text-center animate-pulse">
-                <h1 class="text-5xl md:text-7xl font-black gradient-text">Vaulty Quest</h1>
-                <p class="text-lg text-gray-400 mt-2">Gamify Your Life</p>
-            </div>
-        </div>
+        <!-- Top Header -->
+        <header class="p-4 flex justify-between items-center border-b border-gray-200 dark:border-gray-800 flex-shrink-0">
+            <h1 class="text-xl font-bold text-gray-800 dark:text-white tracking-tighter">Auto Assistant 🚗</h1>
+            <button class="w-8 h-8 rounded-full overflow-hidden">
+                <img src="https://placehold.co/100x100/e81cff/ffffff?text=U" alt="User profile picture">
+            </button>
+        </header>
 
-        <!-- Onboarding Screen (Now Hidden) -->
-        <div id="onboarding-screen" class="hidden absolute inset-0 bg-black z-40 flex flex-col h-full">
-             <div class="flex-grow flex snap-x snap-mandatory overflow-x-auto no-scrollbar">
-                <!-- Slide 1: Main Goals -->
-                <div class="w-full h-full flex-shrink-0 snap-center flex flex-col justify-center items-center p-6 text-center">
-                    <h2 class="text-4xl font-bold gradient-text mb-4">Welcome to Vaulty Quest!</h2>
-                    <p class="text-gray-300 mb-2 max-w-md">To start your adventure, what are your main goals?</p>
-                    <p class="text-gray-400 mb-8">Choose up to 3.</p>
-                    <div class="grid grid-cols-2 gap-4 w-full max-w-md">
-                        <button class="bg-gray-800 p-4 rounded-lg border border-gray-700 hover:border-pink-500 focus:border-pink-500 focus:outline-none">💰 Finance</button>
-                        <button class="bg-gray-800 p-4 rounded-lg border border-gray-700 hover:border-pink-500 focus:border-pink-500 focus:outline-none">❤️ Health</button>
-                        <button class="bg-gray-800 p-4 rounded-lg border border-gray-700 hover:border-pink-500 focus:border-pink-500 focus:outline-none">🧠 Learning</button>
-                        <button class="bg-gray-800 p-4 rounded-lg border border-gray-700 hover:border-pink-500 focus:border-pink-500 focus:outline-none">👥 Social</button>
+        <!-- Main Content Area -->
+        <main class="flex-grow overflow-y-auto no-scrollbar pb-24">
+            <div class="w-full max-w-5xl mx-auto px-6 py-8">
+
+                <!-- PAGE 1: HOME PAGE -->
+                <div id="page-home" class="page active">
+                    <div class="text-center">
+                        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">Welcome to Auto Assistant</h2>
+                        <p class="text-gray-500 dark:text-gray-400 max-w-2xl mx-auto mb-8">Your AI hub for everything related to cars. Find data, compare models, and discover your next vehicle.</p>
+                        <button data-page="page-tools" class="nav-link-btn animated-gradient text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+                            Start Searching
+                        </button>
                     </div>
-                </div>
-                <!-- Slide 2: Connect Account -->
-                <div class="w-full h-full flex-shrink-0 snap-center flex flex-col justify-center items-center p-6 text-center">
-                    <h2 class="text-3xl font-bold gradient-text mb-2">Create Your Account</h2>
-                    <p class="text-gray-400 mb-8">Connect an account to save your progress.</p>
-                    <div class="space-y-4 w-full max-w-xs">
-                         <button class="w-full flex items-center justify-center p-3 bg-gray-800 rounded-lg border border-gray-700 hover:bg-gray-700">
-                             <i data-lucide="google" class="w-5 h-5 mr-3"></i> Continue with Google
-                         </button>
-                         <button class="w-full flex items-center justify-center p-3 bg-gray-800 rounded-lg border border-gray-700 hover:bg-gray-700">
-                             <i data-lucide="apple" class="w-5 h-5 mr-3"></i> Continue with Apple
-                         </button>
-                         <button id="start-quest-btn" class="w-full p-3 gradient-accent rounded-lg font-bold">Start Your Quest!</button>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- Main App Interface -->
-        <div id="main-app" class="absolute inset-0 bg-black z-30 flex flex-col h-full">
-            <main id="main-content" class="flex-grow overflow-y-auto pb-24">
-                <!-- Home Screen -->
-                <div id="home-screen-content" class="p-4 md:p-6 space-y-6">
-                    <header class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-400">Welcome back, Adventurer!</p>
-                            <h1 class="text-3xl font-bold">Your Dashboard</h1>
+                    <div id="recent-cars-section" class="mt-16 text-left hidden">
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Recently Viewed</h3>
+                        <div id="recent-cars-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                            <!-- Recently viewed cars will be inserted here -->
                         </div>
-                        <div class="flex items-center space-x-4">
-                            <div class="text-right">
-                                <p class="font-semibold gradient-text">Level 1</p>
-                                <div class="w-20 h-2 bg-gray-800 rounded-full mt-1">
-                                    <div class="progress-bar-fill h-2 rounded-full" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <!-- PAGE 2: TOOLS PAGE -->
+                <div id="page-tools" class="page">
+                    <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-6">Tools</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Car Searcher Card -->
+                        <div class="bg-gray-50 dark:bg-gray-800/50 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+                             <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">AI Vehicle Finder</h3>
+                             <p class="text-gray-500 dark:text-gray-400 mb-6">Find detailed information about any vehicle.</p>
+                             <div class="space-y-6">
+                                <div>
+                                    <label for="brand-select" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Brand</label>
+                                    <select id="brand-select" class="w-full p-3 bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 border rounded-lg focus:ring-violet-500 focus:border-violet-500 text-gray-900 dark:text-white">
+                                        <option value="" disabled selected>Select a brand...</option>
+                                    </select>
                                 </div>
+                                <div>
+                                    <label for="model-select" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Model</label>
+                                    <select id="model-select" class="w-full p-3 bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 border rounded-lg focus:ring-violet-500 focus:border-violet-500 text-gray-900 dark:text-white" disabled>
+                                        <option value="" disabled selected>First, select a brand</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="submodel-select" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Sub-model / Trim</label>
+                                    <select id="submodel-select" class="w-full p-3 bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 border rounded-lg focus:ring-violet-500 focus:border-violet-500 text-gray-900 dark:text-white" disabled>
+                                        <option value="" disabled selected>First, select a model</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="year-select" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Year</label>
+                                    <select id="year-select" class="w-full p-3 bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 border rounded-lg focus:ring-violet-500 focus:border-violet-500 text-gray-900 dark:text-white" disabled>
+                                        <option value="" disabled selected>First, select a sub-model</option>
+                                    </select>
+                                </div>
+                                <button id="search-btn" class="w-full animated-gradient text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300" disabled>
+                                    Search Vehicle
+                                </button>
                             </div>
-                            <img id="profile-avatar-img" src="https://placehold.co/40x40/14b8a6/ffffff?text=A" alt="Avatar" class="w-10 h-10 rounded-full border-2 border-teal-500">
                         </div>
-                    </header>
-
-                    <!-- Daily Quests -->
-                    <div class="card p-4 rounded-xl">
-                        <div class="flex items-center justify-between mb-3">
-                             <h2 class="text-xl font-semibold">Daily Quests</h2>
-                             <button id="generate-quests-btn" class="text-sm gradient-text font-semibold flex items-center gap-1 hover:opacity-80 transition-opacity">
-                                ✨ New Quests
-                            </button>
-                        </div>
-                        <div id="daily-quests-list" class="space-y-3">
-                            <!-- Quests will be dynamically inserted here -->
-                        </div>
-                         <div id="quests-loader" class="hidden text-center p-4 text-gray-400">
-                            <p>Generating your next adventure...</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Game Board Categories -->
-                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        <!-- Finance -->
-                        <div class="card p-4 rounded-xl flex flex-col items-start space-y-3 hover:border-emerald-500 transition-colors">
-                            <div class="flex items-center w-full justify-between">
-                                <i data-lucide="piggy-bank" class="w-8 h-8 text-emerald-400"></i>
-                                <p class="font-semibold text-lg">Finance</p>
+                        
+                        <!-- Dream Car Finder Card -->
+                        <div class="bg-gray-50 dark:bg-gray-800/50 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+                            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Find Your Dream Car</h3>
+                            <p class="text-gray-500 dark:text-gray-400 mb-6">Let AI find the perfect car for you. You don't have to fill all fields.</p>
+                            <div class="space-y-6">
+                                <div>
+                                    <label for="type-select" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Car Type (Optional)</label>
+                                    <select id="type-select" class="w-full p-3 bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 border rounded-lg focus:ring-violet-500 focus:border-violet-500 text-gray-900 dark:text-white">
+                                        <option value="">Any Type</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="budget-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Max Budget (€) (Optional)</label>
+                                    <input type="number" id="budget-input" placeholder="e.g., 25000" class="w-full p-3 bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 border rounded-lg focus:ring-violet-500 focus:border-violet-500 text-gray-900 dark:text-white">
+                                </div>
+                                <div>
+                                    <label for="brand-select-dream" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Brand (Optional)</label>
+                                    <select id="brand-select-dream" class="w-full p-3 bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 border rounded-lg focus:ring-violet-500 focus:border-violet-500 text-gray-900 dark:text-white">
+                                        <option value="">Any Brand</option>
+                                    </select>
+                                </div>
+                                 <div>
+                                    <label for="year-select-dream" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Minimum Year (Optional)</label>
+                                    <select id="year-select-dream" class="w-full p-3 bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 border rounded-lg focus:ring-violet-500 focus:border-violet-500 text-gray-900 dark:text-white">
+                                        <option value="">Any Year</option>
+                                    </select>
+                                </div>
+                                <button id="find-dream-car-btn" class="w-full animated-gradient text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+                                    Find My Dream Car
+                                </button>
                             </div>
-                            <p class="text-sm text-gray-400">Monthly Budget: 0%</p>
-                            <div class="w-full h-2 bg-gray-900 rounded-full">
-                                <div class="progress-bar-fill h-2 rounded-full" style="width: 0%;"></div>
-                            </div>
-                            <button id="open-finance-btn" class="mt-auto text-sm w-full text-center gradient-accent text-white font-semibold py-1 px-2 rounded-md hover:opacity-90 transition-opacity">✨ Analyze Spending</button>
-                        </div>
-                         <!-- Health -->
-                        <div class="card p-4 rounded-xl flex flex-col items-start space-y-3 hover:border-rose-500 transition-colors">
-                            <div class="flex items-center w-full justify-between">
-                                <i data-lucide="heart-pulse" class="w-8 h-8 text-rose-400"></i>
-                                <p class="font-semibold text-lg">Health</p>
-                            </div>
-                            <p class="text-sm text-gray-400">Daily Steps: 0/10k</p>
-                            <div class="w-full h-2 bg-gray-900 rounded-full">
-                                <div class="progress-bar-fill h-2 rounded-full" style="width: 0%;"></div>
-                            </div>
-                             <button class="mt-auto text-sm w-full text-center gradient-accent text-white font-semibold py-1 px-2 rounded-md hover:opacity-90 transition-opacity">🏃 Log Activity</button>
-                        </div>
-                        <!-- Learning -->
-                        <div class="card p-4 rounded-xl flex flex-col items-start space-y-3 hover:border-amber-500 transition-colors">
-                            <div class="flex items-center w-full justify-between">
-                                <i data-lucide="graduation-cap" class="w-8 h-8 text-amber-400"></i>
-                                <p class="font-semibold text-lg">Learning</p>
-                            </div>
-                            <p class="text-sm text-gray-400">Weekly Goal: 0/3 lessons</p>
-                            <div class="w-full h-2 bg-gray-900 rounded-full">
-                                <div class="progress-bar-fill h-2 rounded-full" style="width: 0%;"></div>
-                            </div>
-                            <button id="open-learning-btn" class="mt-auto text-sm w-full text-center gradient-accent text-white font-semibold py-1 px-2 rounded-md hover:opacity-90 transition-opacity">✨ Learn Something New</button>
-                        </div>
-                        <!-- Productivity -->
-                        <div class="card p-4 rounded-xl flex flex-col items-start space-y-3 hover:border-sky-500 transition-colors">
-                            <div class="flex items-center w-full justify-between">
-                                <i data-lucide="timer" class="w-8 h-8 text-sky-400"></i>
-                                <p class="font-semibold text-lg">Productivity</p>
-                            </div>
-                            <p class="text-sm text-gray-400">Tasks Today: 0/5</p>
-                            <div class="w-full h-2 bg-gray-900 rounded-full">
-                                <div class="progress-bar-fill h-2 rounded-full" style="width: 0%;"></div>
-                            </div>
-                            <button id="breakdown-goal-btn" class="mt-2 text-sm w-full text-center gradient-accent text-white font-semibold py-1 px-2 rounded-md hover:opacity-90 transition-opacity">✨ Break Down Goal</button>
-                        </div>
-                        <!-- Social -->
-                        <div class="card p-4 rounded-xl flex flex-col items-start space-y-3 hover:border-pink-500 transition-colors">
-                            <div class="flex items-center w-full justify-between">
-                                <i data-lucide="users" class="w-8 h-8 text-pink-400"></i>
-                                <p class="font-semibold text-lg">Social</p>
-                            </div>
-                            <p class="text-sm text-gray-400">Connections: 0</p>
-                            <div class="w-full h-2 bg-gray-900 rounded-full">
-                                <div class="progress-bar-fill h-2 rounded-full" style="width: 0%;"></div>
-                            </div>
-                            <button id="open-group-quest-btn" class="mt-2 text-sm w-full text-center gradient-accent text-white font-semibold py-1 px-2 rounded-md hover:opacity-90 transition-opacity">🤝 Start Group Quest</button>
-                        </div>
-                        <!-- Daily Reflection -->
-                        <div class="card p-4 rounded-xl flex flex-col items-start space-y-3 hover:border-violet-500 transition-colors">
-                            <div class="flex items-center w-full justify-between">
-                                <i data-lucide="sparkles" class="w-8 h-8 text-violet-400"></i>
-                                <p class="font-semibold text-lg">Reflection</p>
-                            </div>
-                            <p class="text-sm text-gray-400">Review your day.</p>
-                            <button id="open-reflection-btn" class="mt-auto text-sm w-full text-center gradient-accent text-white font-semibold py-1 px-2 rounded-md hover:opacity-90 transition-opacity">✨ Reflect Now</button>
                         </div>
                     </div>
                 </div>
-
-                <!-- Chat Screen -->
-                <div id="chat-screen-content" class="hidden p-4 md:p-6 h-full flex flex-col">
-                    <h1 class="text-3xl font-bold text-center mb-4">AI Coach</h1>
-                    <div id="chat-messages" class="flex-grow bg-gray-900 rounded-xl p-4 space-y-4 overflow-y-auto">
-                        <!-- AI Message -->
-                        <div class="flex items-start gap-3 chat-bubble">
-                            <div class="w-8 h-8 rounded-full gradient-accent flex items-center justify-center font-bold text-sm flex-shrink-0">VQ</div>
-                            <div class="bg-gray-800 p-3 rounded-lg max-w-xs md:max-w-md">
-                                <p>Hello! How can I help you level up your life today? You can ask me to plan your day, analyze your spending, or create a new workout plan!</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mt-4 flex items-center gap-2 p-2 card rounded-full">
-                        <button class="p-2 hover:bg-gray-700/50 rounded-full"><i data-lucide="paperclip" class="w-5 h-5"></i></button>
-                        <input id="chat-input" type="text" placeholder="Ask your AI coach..." class="w-full bg-transparent focus:outline-none px-2">
-                        <button class="p-2 hover:bg-gray-700/50 rounded-full"><i data-lucide="mic" class="w-5 h-5"></i></button>
-                        <button id="send-chat-btn" class="p-3 gradient-accent rounded-full"><i data-lucide="send" class="w-5 h-5"></i></button>
-                    </div>
-                </div>
-
-                <!-- Modules Screen -->
-                <div id="modules-screen-content" class="hidden p-4 md:p-6">
-                    <h1 class="text-3xl font-bold mb-6">All Modules</h1>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="card p-4 rounded-xl flex items-center justify-between">
-                            <div class="flex items-center"><i data-lucide="piggy-bank" class="w-8 h-8 mr-4 text-emerald-400"></i><span class="text-lg font-semibold">Finance</span></div>
-                            <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" value="" class="sr-only peer" checked><div class="w-11 h-6 bg-gray-600 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div></label>
-                        </div>
-                        <div class="card p-4 rounded-xl flex items-center justify-between">
-                            <div class="flex items-center"><i data-lucide="heart-pulse" class="w-8 h-8 mr-4 text-rose-400"></i><span class="text-lg font-semibold">Health</span></div>
-                            <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" value="" class="sr-only peer" checked><div class="w-11 h-6 bg-gray-600 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div></label>
-                        </div>
-                        <!-- Add all other modules here... -->
-                        <div class="card p-4 rounded-xl flex items-center justify-between">
-                            <div class="flex items-center"><i data-lucide="plane" class="w-8 h-8 mr-4 text-amber-400"></i><span class="text-lg font-semibold">Travel</span></div>
-                             <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" value="" class="sr-only peer"><div class="w-11 h-6 bg-gray-600 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div></label>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Profile Screen -->
-                <div id="profile-screen-content" class="hidden p-4 md:p-6 text-center">
-                    <img id="profile-avatar-main" src="https://placehold.co/100x100/14b8a6/ffffff?text=A" alt="Avatar" class="w-24 h-24 rounded-full border-4 border-teal-500 mx-auto">
-                    <h1 class="text-3xl font-bold mt-4">Adventurer</h1>
-                    <p class="gradient-text font-semibold">Level 1 - Getting Started</p>
-                    
-                    <div id="upgrade-premium-btn" class="card rounded-xl p-4 mt-8 text-left cursor-pointer hover:bg-gray-800">
-                        <h2 class="text-xl font-bold gradient-text">Upgrade to Premium</h2>
-                        <p class="text-gray-400 mt-1">Unlock AI coaching, unlimited quests, and advanced analytics!</p>
-                    </div>
-
-                    <div id="premium-features-section" class="mt-6 text-left">
-                        <h3 class="font-semibold text-lg mb-2">Premium Features</h3>
-                        <div class="card rounded-xl divide-y divide-gray-700">
-                           <a href="#" id="analytics-btn" class="premium-locked block p-4 hover:bg-gray-800 flex justify-between items-center"><span><i data-lucide="bar-chart-3" class="inline w-5 h-5 mr-2"></i>Analytics</span> <i data-lucide="lock" class="premium-lock-icon w-4 h-4 text-yellow-400"></i></a>
-                           <a href="#" id="avatar-btn" class="premium-locked block p-4 hover:bg-gray-800 flex justify-between items-center"><span><i data-lucide="user-plus" class="inline w-5 h-5 mr-2"></i>Customize Avatar</span> <i data-lucide="lock" class="premium-lock-icon w-4 h-4 text-yellow-400"></i></a>
-                           <a href="#" class="premium-locked block p-4 hover:bg-gray-800 flex justify-between items-center"><span><i data-lucide="palette" class="inline w-5 h-5 mr-2"></i>App Themes</span> <i data-lucide="lock" class="premium-lock-icon w-4 h-4 text-yellow-400"></i></a>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-6 text-left">
-                        <h3 class="font-semibold text-lg mb-2">Settings</h3>
-                        <div class="card rounded-xl divide-y divide-gray-700">
-                           <a href="#" class="block p-4 hover:bg-gray-800">Account</a>
-                           <a href="#" class="block p-4 hover:bg-gray-800">Notifications</a>
-                           <a href="#" class="block p-4 hover:bg-gray-800">Security & Privacy</a>
-                           <a href="#" class="block p-4 hover:bg-gray-800 text-red-500">Logout</a>
-                        </div>
-                    </div>
-                </div>
-            </main>
-
-            <!-- Floating Action Buttons -->
-            <div id="fab-container" class="absolute bottom-24 right-6 flex flex-col items-center space-y-3">
-                <!-- Speed Dial Menu (hidden by default) -->
-                <div class="flex flex-col items-center space-y-3">
-                    <button id="fab-add-task" class="fab-menu-item w-12 h-12 bg-gray-700 rounded-full flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform">
-                        <i data-lucide="check-square" class="w-6 h-6"></i>
+                
+                <!-- PAGE 3: RESULTS PAGE -->
+                <div id="page-results" class="page">
+                    <button id="back-btn" class="mb-6 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white font-bold py-2 px-4 rounded-lg flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+                        <span>Back to Search</span>
                     </button>
-                     <button id="fab-log-activity" class="fab-menu-item w-12 h-12 bg-gray-700 rounded-full flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform">
-                        <i data-lucide="heart-pulse" class="w-6 h-6"></i>
-                    </button>
-                    <button id="fab-new-goal" class="fab-menu-item w-12 h-12 bg-gray-700 rounded-full flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform">
-                        <i data-lucide="target" class="w-6 h-6"></i>
-                    </button>
-                </div>
-                <!-- Main FABs -->
-                 <button id="scan-fab-btn" class="w-12 h-12 bg-gray-700 rounded-full flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform">
-                    <i data-lucide="scan-line" class="w-6 h-6"></i>
-                </button>
-                <button id="fab-toggle-btn" class="w-14 h-14 gradient-accent rounded-full flex items-center justify-center shadow-lg transform hover:scale-110 transition-all duration-300">
-                    <i data-lucide="plus" class="w-8 h-8 transition-transform duration-300"></i>
-                </button>
-            </div>
-
-
-            <!-- Bottom Navigation Bar -->
-            <nav class="absolute bottom-0 left-0 right-0 bg-black/50 backdrop-blur-sm border-t border-gray-800">
-                <div class="flex justify-around max-w-2xl mx-auto">
-                    <button class="nav-item p-4 text-center text-gray-400 hover:text-white nav-active" data-target="home-screen">
-                        <i data-lucide="layout-dashboard" class="w-6 h-6 mx-auto"></i><span class="text-xs">Home</span>
-                    </button>
-                    <button class="nav-item p-4 text-center text-gray-400 hover:text-white" data-target="chat-screen">
-                        <i data-lucide="bot" class="w-6 h-6 mx-auto"></i><span class="text-xs">Chat</span>
-                    </button>
-                    <button class="nav-item p-4 text-center text-gray-400 hover:text-white" data-target="modules-screen">
-                        <i data-lucide="package" class="w-6 h-6 mx-auto"></i><span class="text-xs">Modules</span>
-                    </button>
-                    <button class="nav-item p-4 text-center text-gray-400 hover:text-white" data-target="profile-screen">
-                        <i data-lucide="user-circle" class="w-6 h-6 mx-auto"></i><span class="text-xs">Profile</span>
-                    </button>
-                </div>
-            </nav>
-        </div>
-
-        <!-- Premium Subscription Modal -->
-        <div id="premium-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
-            <div class="card rounded-2xl w-full max-w-md p-6 relative animate-fade-in-up">
-                <button id="close-premium-modal" class="absolute top-4 right-4 text-gray-500 hover:text-white">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
-                <h2 class="text-3xl font-black text-center gradient-text">Go Premium!</h2>
-                <p class="text-center text-gray-400 mt-2">Unlock your full potential.</p>
-                
-                <div class="mt-8 space-y-4">
-                    <div class="border-2 border-teal-500 rounded-xl p-4 text-center cursor-pointer">
-                        <p class="text-xl font-bold">149.99 € / Year</p>
-                        <p class="gradient-text font-semibold">Save 16%!</p>
-                    </div>
-                     <div class="border border-gray-700 rounded-xl p-4 text-center cursor-pointer hover:border-gray-500">
-                        <p class="text-xl font-bold">14.99 € / Month</p>
-                    </div>
-                </div>
-
-                <ul class="mt-8 space-y-3 text-sm">
-                    <li class="flex items-center"><i data-lucide="check-circle-2" class="w-5 h-5 mr-3 text-green-400"></i> **Advanced Progress Analytics**</li>
-                    <li class="flex items-center"><i data-lucide="check-circle-2" class="w-5 h-5 mr-3 text-green-400"></i> **Personalized AI Goal Coaching**</li>
-                    <li class="flex items-center"><i data-lucide="check-circle-2" class="w-5 h-5 mr-3 text-green-400"></i> **Exclusive Avatar & Theme Packs**</li>
-                    <li class="flex items-center"><i data-lucide="check-circle-2" class="w-5 h-5 mr-3 text-green-400"></i> **Group Quests & Leaderboards**</li>
-                    <li class="flex items-center"><i data-lucide="check-circle-2" class="w-5 h-5 mr-3 text-green-400"></i> **Unlimited AI-generated quests**</li>
-                    <li class="flex items-center"><i data-lucide="check-circle-2" class="w-5 h-5 mr-3 text-green-400"></i> Bank & Health device integration</li>
-                </ul>
-                
-                <button class="w-full mt-8 p-3 gradient-accent rounded-lg font-bold">Start 7-Day Free Trial</button>
-                <button id="dev-unlock-premium" class="w-full mt-2 p-2 bg-gray-700 text-xs rounded-lg">DEV: Unlock Premium</button>
-            </div>
-        </div>
-        
-        <!-- Goal Breakdown Modal -->
-        <div id="goal-breakdown-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
-            <div class="card rounded-2xl w-full max-w-md p-6 relative animate-fade-in-up">
-                <button id="close-goal-modal" class="absolute top-4 right-4 text-gray-500 hover:text-white">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
-                <h2 class="text-3xl font-black text-center gradient-text">Break Down Your Goal</h2>
-                <p class="text-center text-gray-400 mt-2">Let the AI turn your big goals into small quests.</p>
-                
-                <div class="mt-8">
-                    <input id="goal-input" type="text" placeholder="e.g., Learn to cook a new recipe" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-pink-500">
-                    <button id="generate-tasks-btn" class="w-full mt-4 p-3 gradient-accent rounded-lg font-bold">✨ Generate Quests</button>
-                </div>
-
-                <div id="goal-loader" class="hidden text-center p-4 mt-4 text-gray-400">
-                    <p>Crafting your questline...</p>
-                </div>
-
-                <div id="task-results-list" class="mt-6 space-y-2 max-h-60 overflow-y-auto">
-                    <!-- Generated tasks will appear here -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Daily Reflection Modal -->
-        <div id="reflection-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
-            <div class="card rounded-2xl w-full max-w-md p-6 relative animate-fade-in-up">
-                <button id="close-reflection-modal" class="absolute top-4 right-4 text-gray-500 hover:text-white">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
-                <h2 class="text-3xl font-black text-center gradient-text">Daily Reflection</h2>
-                <p class="text-center text-gray-400 mt-2">How was your day, Adventurer?</p>
-                
-                <div class="mt-8">
-                    <textarea id="reflection-input" rows="4" placeholder="e.g., I had a productive day but felt a bit tired in the afternoon..." class="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-pink-500 text-sm"></textarea>
-                    <button id="generate-reflection-btn" class="w-full mt-4 p-3 gradient-accent rounded-lg font-bold">✨ Get AI Insight</button>
-                </div>
-
-                <div id="reflection-loader" class="hidden text-center p-4 mt-4 text-gray-400">
-                    <p>Analyzing your day...</p>
-                </div>
-
-                <div id="reflection-results" class="hidden mt-6 space-y-4 text-left">
-                    <!-- Generated reflection will appear here -->
-                </div>
-            </div>
-        </div>
-
-        <!-- AI Learning Modal -->
-        <div id="learning-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
-            <div class="card rounded-2xl w-full max-w-md p-6 relative animate-fade-in-up">
-                <button id="close-learning-modal" class="absolute top-4 right-4 text-gray-500 hover:text-white">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
-                <h2 class="text-3xl font-black text-center gradient-text">Micro-Lesson</h2>
-                <p class="text-center text-gray-400 mt-2">What do you want to learn about in 5 minutes?</p>
-                
-                <div class="mt-8">
-                    <input id="learning-topic-input" type="text" placeholder="e.g., The basics of black holes" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-pink-500">
-                    <button id="generate-lesson-btn" class="w-full mt-4 p-3 gradient-accent rounded-lg font-bold">✨ Generate Lesson</button>
-                </div>
-
-                <div id="learning-loader" class="hidden text-center p-4 mt-4 text-gray-400">
-                    <p>Generating your lesson...</p>
-                </div>
-
-                <div id="learning-results" class="hidden mt-6 text-left max-h-72 overflow-y-auto">
-                    <!-- Generated lesson will appear here -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Finance Analysis Modal -->
-        <div id="finance-analysis-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
-            <div class="card rounded-2xl w-full max-w-md p-6 relative animate-fade-in-up">
-                <button id="close-finance-modal" class="absolute top-4 right-4 text-gray-500 hover:text-white">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
-                <h2 class="text-3xl font-black text-center gradient-text">Analyze Your Spending</h2>
-                <p class="text-center text-gray-400 mt-2">Paste your recent expenses below.</p>
-                
-                <div class="mt-8">
-                    <textarea id="finance-input" rows="4" placeholder="Coffee: $5&#10;Groceries: $75&#10;Netflix: $15&#10;Gas: $40" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-pink-500 text-sm"></textarea>
-                    <button id="generate-finance-insight-btn" class="w-full mt-4 p-3 gradient-accent rounded-lg font-bold">✨ Get Financial Insight</button>
-                </div>
-
-                <div id="finance-loader" class="hidden text-center p-4 mt-4 text-gray-400">
-                    <p>Analyzing your expenses...</p>
-                </div>
-
-                <div id="finance-results" class="hidden mt-6 space-y-4 text-left max-h-72 overflow-y-auto">
-                    <!-- Generated finance insights will appear here -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Analytics Modal (Premium) -->
-        <div id="analytics-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
-            <div class="card rounded-2xl w-full max-w-md p-6 relative animate-fade-in-up">
-                <button id="close-analytics-modal" class="absolute top-4 right-4 text-gray-500 hover:text-white">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
-                <h2 class="text-3xl font-black text-center gradient-text">Your Analytics</h2>
-                <p class="text-center text-gray-400 mt-2">A look at your epic progress.</p>
-                
-                <div class="mt-8 space-y-6">
-                    <div>
-                        <h3 class="font-semibold mb-2">XP Gained (Last 7 Days)</h3>
-                        <div class="card p-3 rounded-lg bg-gray-900 h-32 flex items-end gap-2">
-                             <!-- Fake bar chart -->
-                            <div class="w-full h-1/4 rounded-t-sm bg-teal-500"></div>
-                            <div class="w-full h-1/2 rounded-t-sm bg-teal-500"></div>
-                            <div class="w-full h-1/3 rounded-t-sm bg-teal-500"></div>
-                            <div class="w-full h-3/4 rounded-t-sm bg-teal-500"></div>
-                            <div class="w-full h-2/3 rounded-t-sm bg-teal-500"></div>
-                            <div class="w-full h-full rounded-t-sm bg-teal-500"></div>
-                            <div class="w-full h-1/2 rounded-t-sm bg-teal-500"></div>
+                    <div id="results-content">
+                        <div id="loading-indicator" class="flex items-center justify-center space-x-2 text-gray-500 dark:text-gray-400 py-10">
+                            <svg class="animate-spin h-6 w-6 text-violet-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 R-JET-A0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span>AI is fetching vehicle data...</span>
+                        </div>
+                        <div id="ai-results-container" class="hidden">
+                            <h2 id="result-title" class="text-3xl font-bold text-gray-900 dark:text-white"></h2>
+                            <p id="result-origin" class="text-lg text-gray-500 dark:text-gray-400 mt-1 mb-6"></p>
+                            <div id="results-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- AI generated cards will be inserted here -->
+                            </div>
+                             <div id="broker-cta-container" class="mt-8 text-center">
+                                <!-- Broker button will be inserted here -->
+                            </div>
                         </div>
                     </div>
-                     <div>
-                        <h3 class="font-semibold mb-2">Quest Completion Rate</h3>
-                        <div class="w-full bg-gray-900 rounded-full h-4">
-                          <div class="bg-indigo-500 h-4 rounded-full" style="width: 75%"></div>
+                </div>
+
+                <!-- PAGE 4: BROKER PAGE -->
+                <div id="page-broker" class="page">
+                     <button id="back-to-results-btn" class="mb-6 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white font-bold py-2 px-4 rounded-lg flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+                        <span>Back to Vehicle Details</span>
+                    </button>
+                     <div id="broker-content">
+                        <div id="broker-loading-indicator" class="flex items-center justify-center space-x-2 text-gray-500 dark:text-gray-400 py-10">
+                            <svg class="animate-spin h-6 w-6 text-violet-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span>AI Broker is preparing your offers...</span>
                         </div>
-                        <p class="text-right text-sm mt-1 font-bold">75%</p>
+                        <div id="broker-results-container" class="hidden">
+                            <!-- Broker results will be inserted here -->
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Avatar Customization Modal (Premium) -->
-        <div id="avatar-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
-            <div class="card rounded-2xl w-full max-w-md p-6 relative animate-fade-in-up">
-                <button id="close-avatar-modal" class="absolute top-4 right-4 text-gray-500 hover:text-white">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
-                <h2 class="text-3xl font-black text-center gradient-text">Choose Your Avatar</h2>
-                <p class="text-center text-gray-400 mt-2">Define your adventurer's look.</p>
-                
-                <div class="mt-8 grid grid-cols-4 gap-4">
-                    <img src="https://placehold.co/80x80/14b8a6/ffffff?text=A" alt="Avatar" class="rounded-full cursor-pointer ring-2 ring-teal-500">
-                    <img src="https://placehold.co/80x80/6366f1/ffffff?text=B" alt="Avatar" class="rounded-full cursor-pointer opacity-70 hover:opacity-100">
-                    <img src="https://placehold.co/80x80/ec4899/ffffff?text=C" alt="Avatar" class="rounded-full cursor-pointer opacity-70 hover:opacity-100">
-                    <div class="relative">
-                         <img src="https://placehold.co/80x80/f59e0b/ffffff?text=D" alt="Avatar" class="rounded-full cursor-pointer">
-                         <div class="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center"><i data-lucide="lock" class="w-6 h-6 text-yellow-400"></i></div>
+                <!-- PAGE 5: PROFILE PAGE -->
+                <div id="page-profile" class="page text-center">
+                    <img src="https://placehold.co/128x128/e81cff/ffffff?text=U" class="w-32 h-32 rounded-full mx-auto mb-4 border-4 border-white dark:border-black shadow-lg">
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">User Profile</h2>
+                    <p class="text-gray-500 dark:text-gray-400 mt-2">This page is under construction.</p>
+                </div>
+
+                <!-- PAGE 6: DREAM CAR RESULTS -->
+                <div id="page-dreamcar-results" class="page">
+                    <button id="back-to-tools-btn" class="mb-6 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white font-bold py-2 px-4 rounded-lg flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+                        <span>Back to Tools</span>
+                    </button>
+                    <div id="dreamcar-results-content">
+                        <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-6">Your Top 3 Dream Car Matches</h2>
+                        <div id="dreamcar-loading-indicator" class="flex items-center justify-center space-x-2 text-gray-500 dark:text-gray-400 py-10">
+                            <svg class="animate-spin h-6 w-6 text-violet-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span>AI is searching for your dream car...</span>
+                        </div>
+                        <div id="dreamcar-results-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 hidden">
+                            <!-- Dream car results will be inserted here -->
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Group Quest Modal (Premium) -->
-        <div id="group-quest-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
-            <div class="card rounded-2xl w-full max-w-md p-6 relative animate-fade-in-up">
-                <button id="close-group-quest-modal" class="absolute top-4 right-4 text-gray-500 hover:text-white">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
-                <h2 class="text-3xl font-black text-center gradient-text">Start a Group Quest</h2>
-                <p class="text-center text-gray-400 mt-2">Team up for epic rewards!</p>
-                
-                 <div class="mt-8">
-                    <label class="text-sm font-semibold text-gray-400">Quest Name</label>
-                    <input type="text" placeholder="e.g., Weekly Fitness Challenge" class="w-full mt-1 bg-gray-800 border border-gray-700 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-pink-500">
-                    <button class="w-full mt-4 p-3 gradient-accent rounded-lg font-bold">✨ Create & Get Invite Code</button>
-                </div>
             </div>
-        </div>
-        
-        <!-- Scan Modal -->
-        <div id="scan-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
-            <div class="card rounded-2xl w-full max-w-md p-6 relative animate-fade-in-up">
-                <button id="close-scan-modal" class="absolute top-4 right-4 text-gray-500 hover:text-white">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
-                <h2 class="text-3xl font-black text-center gradient-text">Scan Document</h2>
-                <p class="text-center text-gray-400 mt-2">Point your camera at a receipt, document, or page.</p>
-                
-                 <div class="mt-8 w-full h-64 bg-gray-900 rounded-lg flex items-center justify-center">
-                    <p class="text-gray-500">[Camera View Placeholder]</p>
-                 </div>
-                 <button class="w-full mt-4 p-3 gradient-accent rounded-lg font-bold flex items-center justify-center gap-2">
-                    <i data-lucide="camera" class="w-5 h-5"></i>
-                    <span>Capture</span>
-                </button>
-            </div>
-        </div>
+        </main>
 
+        <!-- Bottom Navigation -->
+        <nav class="flex-shrink-0 bg-white/80 dark:bg-black/80 backdrop-blur-sm flex justify-center items-center space-x-12 z-50 fixed bottom-0 left-0 right-0 border-t border-gray-200 dark:border-gray-800 h-16">
+            <button data-page="page-home" class="nav-item active text-gray-500 dark:text-gray-400 transition-colors duration-200 flex flex-col items-center justify-center w-20 h-full">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <span class="text-xs mt-1">Home</span>
+            </button>
+            <button data-page="page-tools" class="nav-item text-gray-500 dark:text-gray-400 transition-colors duration-200 flex flex-col items-center justify-center w-20 h-full">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                <span class="text-xs mt-1">Tools</span>
+            </button>
+            <button data-page="page-profile" class="nav-item text-gray-500 dark:text-gray-400 transition-colors duration-200 flex flex-col items-center justify-center w-20 h-full">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span class="text-xs mt-1">Profile</span>
+            </button>
+        </nav>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            lucide.createIcons();
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    
+    // --- Car Data ---
+    // Function to generate years for a range
+    const generateYears = (start, end) => Array.from({ length: end - start + 1 }, (_, i) => end - i).map(String);
+    const modernYears = (start) => generateYears(start, 2025);
+    const classicYears = (start, end) => generateYears(start, end);
 
-            // --- App State ---
-            let isPremium = false; // User is on the free plan by default
-            let dailyQuests = [
-                { icon: 'walk', color: 'text-blue-400', title: 'Morning Stroll', description: 'Walk 2,000 steps', xp: 25, coins: 10 },
-                { icon: 'book-open', color: 'text-pink-400', title: 'Knowledge Nibble', description: 'Read an article for 5 mins', xp: 20, coins: 5 }
-            ];
+    const carData = {
+        "Abarth": {
+            "595": { "Turismo": modernYears(2018), "Competizione": modernYears(2018), "Esseesse": modernYears(2020) },
+            "695": { "Biposto": classicYears(2014, 2016), "Rivale": ["2018"], "70th Anniversario": ["2020"] },
+            "124 Spider": { "Scorpione": classicYears(2016, 2019), "GT": ["2018"] }
+        },
+        "Acura": {
+            "Integra": { "GS-R": classicYears(1994, 2001), "Type R": classicYears(1997, 2001), "A-Spec": modernYears(2023), "Type S": modernYears(2024) },
+            "MDX": { "A-Spec": modernYears(2019), "Type S": modernYears(2022) },
+            "NSX": { "First Gen": classicYears(1991, 2005), "Second Gen": classicYears(2017, 2021), "Type S": ["2022"] },
+            "RDX": { "A-Spec": modernYears(2019), "PMC Edition": ["2021"] },
+            "TLX": { "A-Spec": modernYears(2021), "Type S": modernYears(2021) }
+        },
+        "Alfa Romeo": {
+            "Giulia": { "Sprint": modernYears(2021), "Veloce": modernYears(2019), "Quadrifoglio": modernYears(2018) },
+            "Stelvio": { "Super": modernYears(2020), "Veloce": modernYears(2021), "Quadrifoglio": modernYears(2020) },
+            "Tonale": { "Veloce": modernYears(2023), "Sprint": modernYears(2023) },
+            "4C": { "Coupe": classicYears(2015, 2019), "Spider": classicYears(2015, 2020) },
+            "GTV6": { "2.5": classicYears(1981, 1987) }
+        },
+        "Alpine": {
+            "A110": { "Pure": modernYears(2019), "Légende": modernYears(2019), "S": modernYears(2020) }
+        },
+        "Aston Martin": {
+            "DB5": { "Standard": classicYears(1963, 1965) },
+            "DB11": { "V8": modernYears(2019), "Volante": modernYears(2019), "AMR": modernYears(2020) },
+            "DBS": { "Superleggera": modernYears(2019) },
+            "Vantage": { "V8": modernYears(2020), "Roadster": modernYears(2021), "F1 Edition": modernYears(2022) },
+            "DBX": { "V8": modernYears(2021), "707": modernYears(2022) }
+        },
+        "Audi": {
+            "A1": { "Sportback 30 TFSI": modernYears(2019), "Citycarver": modernYears(2020) },
+            "A3": { "8P": classicYears(2003, 2013), "8V": classicYears(2012, 2020), "Sportback 35 TFSI (8Y)": modernYears(2020), "S3 Sportback (8Y)": modernYears(2021), "RS3 Sportback (8Y)": modernYears(2022) },
+            "A4": { "B8": classicYears(2008, 2016), "B9 Sedan 40 TFSI": modernYears(2020), "B9 Avant 40 TDI": modernYears(2019), "B9 Allroad": modernYears(2020), "S4 Avant (B9)": modernYears(2020), "RS4 Avant (B9)": modernYears(2020) },
+            "A5": { "Coupe 45 TFSI": modernYears(2020), "Sportback S line": modernYears(2021), "S5 Sportback": modernYears(2020), "RS5 Coupe": modernYears(2020) },
+            "A6": { "C7": classicYears(2011, 2018), "C8 Sedan 55 TFSI": modernYears(2019), "C8 Avant 55 TFSI": modernYears(2019), "C8 Allroad": modernYears(2020), "S6 Avant (C8)": modernYears(2020), "RS6 Avant (C8)": modernYears(2020) },
+            "A7": { "Sportback 55 TFSI": modernYears(2019), "S7 Sportback": modernYears(2020), "RS7 Sportback": modernYears(2020) },
+            "A8": { "L 60 TFSI": modernYears(2019), "S8": modernYears(2020) },
+            "Q2": { "35 TFSI": modernYears(2019), "SQ2": modernYears(2020) },
+            "Q3": { "Sportback 45 TFSI": modernYears(2020), "RS Q3 Sportback": modernYears(2021) },
+            "Q5": { "45 TFSI": modernYears(2018), "Sportback": modernYears(2021), "SQ5": modernYears(2019) },
+            "Q7": { "4L": classicYears(2005, 2015), "4M 55 TFSI": modernYears(2020), "SQ7 (4M)": modernYears(2021) },
+            "Q8": { "55 TFSI": modernYears(2019), "SQ8": modernYears(2020), "RS Q8": modernYears(2020) },
+            "R8": { "Type 42": classicYears(2006, 2015), "V10 RWD": modernYears(2021), "V10 Performance": modernYears(2019), "Spyder": modernYears(2020) },
+            "TT": { "Mk1": classicYears(1998, 2006), "Mk2": classicYears(2006, 2014), "Mk3 Coupe 45 TFSI": modernYears(2019), "TTS Roadster": modernYears(2020), "TT RS Coupe": modernYears(2020) },
+            "e-tron GT": { "quattro": modernYears(2022), "RS e-tron GT": modernYears(2022) },
+            "Q4 e-tron": { "50 quattro": modernYears(2022), "Sportback": modernYears(2022) },
+            "Sport Quattro": { "S1": classicYears(1984, 1985) }
+        },
+        "Bentley": {
+            "Continental GT": { "W12": modernYears(2019), "V8": modernYears(2020), "Speed": modernYears(2022), "Mulliner": modernYears(2021) },
+            "Flying Spur": { "W12": modernYears(2020), "V8": modernYears(2021), "Hybrid": modernYears(2022) },
+            "Bentayga": { "V8": modernYears(2019), "Speed": modernYears(2021), "Hybrid": modernYears(2021), "EWB": modernYears(2023) }
+        },
+        "BMW": {
+            "1 Series": { "E87": classicYears(2004, 2011), "F20": classicYears(2011, 2019), "F40 118i": modernYears(2019), "128ti": modernYears(2021), "M135i xDrive": modernYears(2020), "1M Coupe": ["2011", "2012"] },
+            "2 Series": { "F22 220i Coupe": modernYears(2022), "M240i xDrive": modernYears(2022), "F45 Gran Coupe": modernYears(2020), "U06 Active Tourer": modernYears(2022) },
+            "3 Series": { "E46": classicYears(1998, 2006), "E90": classicYears(2005, 2011), "F30": classicYears(2012, 2018), "G20 320d": modernYears(2019), "330e": modernYears(2020), "M340i xDrive": modernYears(2020), "G21 Touring": modernYears(2020) },
+            "4 Series": { "F32": classicYears(2014, 2020), "G22 420i Coupe": modernYears(2021), "M440i xDrive": modernYears(2021), "Gran Coupe": modernYears(2022), "Convertible": modernYears(2021) },
+            "5 Series": { "E39": classicYears(1995, 2004), "E60": classicYears(2003, 2010), "F10": classicYears(2010, 2017), "G30 520d": modernYears(2017), "540i": modernYears(2018), "545e xDrive": modernYears(2021), "G31 Touring": modernYears(2018) },
+            "6 Series": { "E63": classicYears(2003, 2010), "F13": classicYears(2011, 2018), "G32 Gran Turismo": classicYears(2018, 2023) },
+            "7 Series": { "E65": classicYears(2001, 2008), "F01": classicYears(2008, 2015), "G11 740d xDrive": modernYears(2020), "G70 750e xDrive": modernYears(2023), "i7 xDrive60": modernYears(2023) },
+            "8 Series": { "E31": classicYears(1990, 1999), "G15 840i Gran Coupe": modernYears(2020), "M850i xDrive Coupe": modernYears(2019) },
+            "X1": { "E84": classicYears(2009, 2015), "F48": classicYears(2015, 2022), "U11 xDrive23i": modernYears(2022), "iX1": modernYears(2023) },
+            "X2": { "F39 M35i": modernYears(2020) },
+            "X3": { "E83": classicYears(2003, 2010), "F25": classicYears(2010, 2017), "G01 xDrive20d": modernYears(2018), "M40i": modernYears(2019), "iX3": modernYears(2022) },
+            "X4": { "F26": classicYears(2014, 2018), "G02 xDrive30d": modernYears(2019), "M40i": modernYears(2020) },
+            "X5": { "E53": classicYears(1999, 2006), "E70": classicYears(2006, 2013), "F15": classicYears(2013, 2018), "G05 xDrive40d": modernYears(2019), "M60i": modernYears(2023), "xDrive45e": modernYears(2020) },
+            "X6": { "E71": classicYears(2008, 2014), "F16": classicYears(2014, 2019), "G06 xDrive40d": modernYears(2020), "M60i": modernYears(2023) },
+            "X7": { "M60i": modernYears(2023), "xDrive40d": modernYears(2021) },
+            "Z4": { "E85": classicYears(2002, 2008), "E89": classicYears(2009, 2016), "G29 sDrive30i": modernYears(2019), "M40i": modernYears(2019) },
+            "i4": { "eDrive40": modernYears(2022), "M50": modernYears(2022) },
+            "iX": { "xDrive50": modernYears(2022), "M60": modernYears(2023) },
+            "M2": { "F87 Competition": classicYears(2018, 2021), "G87": modernYears(2023) },
+            "M3": { "E30": classicYears(1986, 1991), "E36": classicYears(1992, 1999), "E46": classicYears(2000, 2006), "E92": classicYears(2007, 2013), "F80": classicYears(2014, 2018), "G80 Competition": modernYears(2021), "G81 Touring": modernYears(2023) },
+            "M4": { "F82 Competition": classicYears(2016, 2020), "G82 Competition": modernYears(2021), "CSL": ["2023"] },
+            "M5": { "E39": classicYears(1998, 2003), "E60": classicYears(2005, 2010), "F90 Competition": modernYears(2018) },
+            "M8": { "Competition Coupe": modernYears(2020), "Competition Gran Coupe": modernYears(2020) },
+            "X3 M": { "Competition": modernYears(2020) },
+            "X5 M": { "Competition": modernYears(2020) },
+            "X6 M": { "Competition": modernYears(2020) }
+        },
+        "Bugatti": {
+            "Veyron": { "16.4": classicYears(2005, 2011), "Super Sport": classicYears(2010, 2011) },
+            "Chiron": { "Standard": modernYears(2017), "Sport": modernYears(2019), "Pur Sport": modernYears(2021), "Super Sport 300+": modernYears(2021) },
+            "Divo": { "Standard": ["2020", "2021"] },
+            "Centodieci": { "Standard": ["2022"] }
+        },
+        "Cadillac": {
+            "CT5-V": { "Blackwing": modernYears(2022) },
+            "Escalade": { "ESV": modernYears(2021), "V-Series": modernYears(2023) },
+            "Lyriq": { "Debut Edition": modernYears(2023) }
+        },
+        "Chevrolet": {
+            "Camaro": { "SS": modernYears(2018), "ZL1 1LE": modernYears(2019) },
+            "Corvette": { "C6 Z06": classicYears(2006, 2013), "C7 Stingray": classicYears(2014, 2019), "C8 Stingray": modernYears(2020), "C8 Z06": modernYears(2023), "E-Ray": modernYears(2024) },
+            "Silverado": { "1500 RST": modernYears(2020), "ZR2": modernYears(2022) },
+            "Tahoe": { "Z71": modernYears(2021) }
+        },
+        "Citroën": {
+            "C3": { "Gen 2": classicYears(2009, 2016), "Gen 3 Shine": modernYears(2017) },
+            "C5 Aircross": { "Shine Pack": modernYears(2021) },
+            "DS3": { "Sport Chic": classicYears(2010, 2015) }
+        },
+        "Dodge": {
+            "Challenger": { "SRT Hellcat": modernYears(2019), "SRT Demon": ["2018"], "SRT Demon 170": ["2023"] },
+            "Charger": { "SRT Hellcat Widebody": modernYears(2020) },
+            "Durango": { "SRT Hellcat": ["2021", "2023"] },
+            "Viper": { "ACR": ["2016", "2017"] }
+        },
+        "Ferrari": {
+            "296": { "GTB": modernYears(2022), "GTS": modernYears(2023) },
+            "SF90": { "Stradale": modernYears(2020), "Spider": modernYears(2021) },
+            "812": { "Superfast": classicYears(2017, 2023), "GTS": modernYears(2020), "Competizione": ["2022"] },
+            "F8": { "Tributo": classicYears(2020, 2023), "Spider": classicYears(2020, 2023) },
+            "Roma": { "Standard": modernYears(2021) },
+            "Purosangue": { "Standard": modernYears(2023) },
+            "Monza": { "SP1": ["2019"], "SP2": ["2019"] },
+            "LaFerrari": { "Coupé": ["2014", "2015", "2016"], "Aperta": ["2017", "2018"] },
+            "Enzo": { "Standard": classicYears(2002, 2004) },
+            "F40": { "Standard": classicYears(1987, 1992) },
+            "F50": { "Standard": classicYears(1995, 1997) },
+            "Testarossa": { "Standard": classicYears(1984, 1991) }
+        },
+        "Fiat": {
+            "500": { "Lounge": modernYears(2018), "Electric": modernYears(2021) },
+            "Panda": { "Cross": modernYears(2019) }
+        },
+        "Ford": {
+            "Fiesta": { "ST (Mk7)": classicYears(2013, 2017), "ST (Mk8)": classicYears(2018, 2023) },
+            "Focus": { "ST (Mk3)": classicYears(2012, 2018), "RS (Mk3)": classicYears(2016, 2018), "ST (Mk4)": modernYears(2019) },
+            "Mustang": { "GT (S197)": classicYears(2005, 2014), "GT (S550)": modernYears(2018), "Mach 1": modernYears(2021), "Shelby GT350": classicYears(2016, 2020), "Shelby GT500": modernYears(2020), "Dark Horse": modernYears(2024) },
+            "GT": { "Standard": classicYears(2017, 2022) },
+            "Bronco": { "Raptor": modernYears(2022), "Badlands": modernYears(2021) },
+            "F-150": { "Raptor": modernYears(2021), "Lightning": modernYears(2022) },
+            "Puma": { "ST": modernYears(2021) }
+        },
+        "Genesis": {
+            "G70": { "3.3T Sport": modernYears(2020) },
+            "G80": { "2.5T": modernYears(2021) },
+            "GV80": { "3.5T Prestige": modernYears(2021) }
+        },
+        "Honda": {
+            "Civic": { "Si (9th Gen)": classicYears(2012, 2015), "Type R (FK2)": classicYears(2015, 2016), "Type R (FK8)": classicYears(2017, 2021), "Si (11th Gen)": modernYears(2022), "Type R (FL5)": modernYears(2023) },
+            "Accord": { "Sport 2.0T": classicYears(2018, 2022) },
+            "CR-V": { "Hybrid": modernYears(2020) },
+            "NSX": { "Second Gen": classicYears(2016, 2022) },
+            "S2000": { "AP1": classicYears(2000, 2003), "AP2": classicYears(2004, 2009) }
+        },
+        "Hyundai": {
+            "i20 N": { "Performance": modernYears(2021) },
+            "i30 N": { "Performance": modernYears(2021) },
+            "Kona N": { "Standard": modernYears(2022) },
+            "Ioniq 5": { "N": modernYears(2024), "Ultimate": modernYears(2022) }
+        },
+        "Jaguar": {
+            "F-Type": { "R Coupe": modernYears(2021), "P450 Convertible": modernYears(2022) },
+            "F-Pace": { "SVR": modernYears(2021) },
+            "I-Pace": { "HSE": modernYears(2020) },
+            "XJ": { "X351": classicYears(2010, 2019) }
+        },
+        "Jeep": {
+            "Wrangler": { "Rubicon 392": modernYears(2021), "4xe": modernYears(2022) },
+            "Grand Cherokee": { "Trackhawk": classicYears(2018, 2021), "L Summit": modernYears(2022) }
+        },
+        "Kia": {
+            "Stinger": { "GT2": modernYears(2022) },
+            "Telluride": { "SX": modernYears(2021) },
+            "EV6": { "GT": modernYears(2023), "GT-Line": modernYears(2022) }
+        },
+        "Koenigsegg": {
+            "Agera": { "RS": classicYears(2015, 2018) },
+            "Regera": { "Standard": classicYears(2016, 2022) },
+            "Jesko": { "Absolut": modernYears(2022) },
+            "Gemera": { "Standard": modernYears(2024) }
+        },
+        "Lamborghini": {
+            "Huracan": { "EVO RWD": modernYears(2020), "STO": modernYears(2021), "Tecnica": modernYears(2023), "Sterrato": modernYears(2023) },
+            "Aventador": { "S": classicYears(2017, 2021), "SVJ": classicYears(2018, 2021), "Ultimae": ["2022"] },
+            "Urus": { "Standard": modernYears(2019), "Performante": modernYears(2023) },
+            "Revuelto": { "Standard": modernYears(2024) },
+            "Countach": { "LP400": classicYears(1974, 1978), "LPI 800-4": ["2022"] },
+            "Diablo": { "VT": classicYears(1993, 1998) },
+            "Murciélago": { "LP 670–4 SuperVeloce": ["2009", "2010"] }
+        },
+        "Lancia": {
+            "Delta": { "Integrale Evoluzione II": ["1993", "1994"] },
+            "Stratos": { "HF Stradale": classicYears(1973, 1978) }
+        },
+        "Land Rover": {
+            "Defender": { "110 V8": modernYears(2021), "90": modernYears(2021) },
+            "Range Rover": { "Autobiography": modernYears(2022), "SV": modernYears(2023) },
+            "Range Rover Sport": { "SVR": classicYears(2018, 2022), "P530 First Edition": modernYears(2023) }
+        },
+        "Lexus": {
+            "IS": { "500 F Sport Performance": modernYears(2022) },
+            "LC": { "500": modernYears(2018) },
+            "RC F": { "Fuji Speedway Edition": modernYears(2021) },
+            "LFA": { "Nürburgring Package": ["2012"] }
+        },
+        "Maserati": {
+            "MC20": { "Cielo": modernYears(2023), "Coupe": modernYears(2022) },
+            "Grecale": { "Trofeo": modernYears(2023) },
+            "GranTurismo": { "Trofeo": modernYears(2024) }
+        },
+        "Mazda": {
+            "MX-5": { "NA": classicYears(1990, 1997), "NB": classicYears(1998, 2005), "NC": classicYears(2006, 2015), "ND RF Club": modernYears(2019) },
+            "CX-5": { "Turbo Signature": modernYears(2021) },
+            "RX-7": { "FD Spirit R": ["2002"] },
+            "RX-8": { "R3": classicYears(2009, 2011) }
+        },
+        "McLaren": {
+            "720S": { "Spider": modernYears(2019), "Coupe": classicYears(2017, 2023) },
+            "765LT": { "Spider": ["2022"], "Coupe": ["2021"] },
+            "Artura": { "Standard": modernYears(2023) },
+            "GT": { "Standard": modernYears(2020) },
+            "Senna": { "Standard": ["2019"] },
+            "P1": { "Standard": ["2013", "2014", "2015"] },
+            "F1": { "Standard": classicYears(1992, 1998) }
+        },
+        "Mercedes-Benz": {
+            "A-Class": { "W176": classicYears(2013, 2018), "W177 A 250": modernYears(2019), "AMG A 35": modernYears(2020), "AMG A 45 S": modernYears(2020) },
+            "C-Class": { "W204": classicYears(2007, 2014), "W205 C 300": modernYears(2022), "AMG C 43": modernYears(2023), "AMG C 63 S (W205)": classicYears(2017, 2021), "AMG C 63 S E Performance": modernYears(2024) },
+            "E-Class": { "W212": classicYears(2010, 2016), "W213 E 450": modernYears(2021), "AMG E 53": modernYears(2021), "AMG E 63 S": modernYears(2021) },
+            "S-Class": { "W222": classicYears(2014, 2020), "W223 S 580": modernYears(2021), "Maybach S 680": modernYears(2022) },
+            "CLA": { "AMG 45 S": modernYears(2020) },
+            "CLS": { "AMG 53": modernYears(2019) },
+            "G-Class": { "G 500": modernYears(2019), "AMG G 63": modernYears(2019), "AMG G 63 4x4²": modernYears(2023) },
+            "GLA": { "AMG 45 S": modernYears(2021) },
+            "GLC": { "AMG 63 S Coupe": modernYears(2020) },
+            "GLE": { "AMG 63 S Coupe": modernYears(2021) },
+            "SL": { "R231": classicYears(2012, 2020), "R232 AMG 63": modernYears(2022) },
+            "AMG GT": { "GT C Roadster": modernYears(2020), "GT R": classicYears(2017, 2021), "Black Series": ["2021"] },
+            "SLS AMG": { "Black Series": ["2014"] },
+            "300 SL": { "Gullwing": classicYears(1954, 1957) }
+        },
+        "Mitsubishi": {
+            "Lancer Evolution": { "VIII": classicYears(2003, 2005), "IX MR": ["2006"], "X Final Edition": ["2015"] }
+        },
+        "Nissan": {
+            "GT-R": { "R35 Premium": modernYears(2017), "Nismo": modernYears(2020) },
+            "Z": { "370Z Nismo": classicYears(2015, 2020), "Proto Spec": ["2023"], "Performance": modernYears(2023) },
+            "Silvia": { "S13": classicYears(1989, 1994), "S14": classicYears(1995, 1998), "S15 Spec-R": classicYears(1999, 2002) },
+            "Skyline GT-R": { "R32": classicYears(1989, 1994), "R33": classicYears(1995, 1998), "R34 V-Spec II Nür": ["2002"] }
+        },
+        "Pagani": {
+            "Zonda": { "Cinque": ["2009"] },
+            "Huayra": { "BC Roadster": modernYears(2020) },
+            "Utopia": { "Standard": modernYears(2023) }
+        },
+        "Peugeot": {
+            "208": { "GT": modernYears(2020) },
+            "3008": { "GT Hybrid4": modernYears(2021) },
+            "205": { "GTI 1.9": classicYears(1987, 1992) }
+        },
+        "Polestar": {
+            "1": { "Standard": classicYears(2020, 2022) },
+            "2": { "Long Range Dual Motor": modernYears(2021) }
+        },
+        "Porsche": {
+            "718": { "Cayman S": modernYears(2017), "Boxster GTS 4.0": modernYears(2020), "Cayman GT4 RS": modernYears(2022), "Spyder RS": modernYears(2024) },
+            "911": {
+                "997 Carrera": classicYears(2005, 2012), "991 Carrera": classicYears(2012, 2019), "992 Carrera": modernYears(2020), "992 Carrera S": modernYears(2020), "992 GTS": modernYears(2022), "992 Targa 4S": modernYears(2021),
+                "992 Turbo S": modernYears(2021), "992 GT3": modernYears(2022), "992 GT3 RS": modernYears(2023), "Dakar": ["2023"], "S/T": ["2024"],
+                "930 Turbo": classicYears(1975, 1989), "964 Carrera RS": ["1992"], "993 GT2": ["1995"], "997 GT3 RS 4.0": ["2011"]
+            },
+            "Taycan": { "4S": modernYears(2020), "Turbo S": modernYears(2020), "Cross Turismo": modernYears(2022) },
+            "Panamera": { "Turbo S E-Hybrid": modernYears(2021) },
+            "Cayenne": { "S": modernYears(2019), "Turbo GT": modernYears(2022) },
+            "Macan": { "GTS": modernYears(2022) },
+            "918 Spyder": { "Weissach Package": ["2015"] },
+            "Carrera GT": { "Standard": classicYears(2004, 2006) }
+        },
+        "Renault": {
+            "Megane R.S.": { "Trophy-R": ["2020"], "Ultime": ["2023"] },
+            "Clio V6": { "Phase 2": classicYears(2003, 2005) }
+        },
+        "Rimac": {
+            "Nevera": { "Standard": modernYears(2022) }
+        },
+        "Rolls-Royce": {
+            "Phantom": { "EWB": modernYears(2018) },
+            "Cullinan": { "Black Badge": modernYears(2020) },
+            "Ghost": { "Black Badge": modernYears(2022) }
+        },
+        "Subaru": {
+            "WRX": { "STI (VA)": classicYears(2015, 2021), "STI S209": ["2019"], "New Gen (VB)": modernYears(2022) },
+            "BRZ": { "Limited": modernYears(2022) },
+            "Impreza": { "22B STI": ["1998"] }
+        },
+        "Tesla": {
+            "Model 3": { "Performance": modernYears(2020), "Long Range": modernYears(2021) },
+            "Model S": { "Plaid": modernYears(2021), "Long Range": modernYears(2021) },
+            "Model X": { "Plaid": modernYears(2021), "Long Range": modernYears(2021) },
+            "Model Y": { "Performance": modernYears(2021), "Long Range": modernYears(2021) }
+        },
+        "Toyota": {
+            "Supra": { "Mk4 Twin Turbo": classicYears(1993, 2002), "GR 3.0 (A90)": modernYears(2020), "A91-MT Edition": ["2023"] },
+            "GR Yaris": { "Circuit Pack": modernYears(2021) },
+            "GR86": { "Premium": modernYears(2022) },
+            "GR Corolla": { "Circuit Edition": ["2023"] },
+            "Land Cruiser": { "Series 300": modernYears(2022) },
+            "AE86": { "Sprinter Trueno": classicYears(1983, 1987) }
+        },
+        "Volkswagen": {
+            "Golf": { "Mk5 GTI": classicYears(2004, 2008), "Mk6 R": classicYears(2010, 2013), "Mk7 GTI": classicYears(2013, 2020), "Mk7 R": classicYears(2014, 2020), "Mk8 GTI": modernYears(2021), "Mk8 R": modernYears(2022), "GTI Clubsport": modernYears(2021) },
+            "Polo": { "GTI": modernYears(2022) },
+            "T-Roc": { "R": modernYears(2021) },
+            "ID.4": { "GTX": modernYears(2022) }
+        },
+        "Volvo": {
+            "XC90": { "T8 Recharge": modernYears(2021) },
+            "S60": { "T8 Polestar Engineered": modernYears(2020) }
+        }
+    };
 
-            // --- Gemini API ---
-            /**
-             * Calls the Gemini API to generate content.
-             * @param {string} userQuery The user's prompt.
-             * @param {object} [systemInstruction] Optional system instruction object.
-             * @param {object} [generationConfig] Optional generation config for structured responses.
-             * @returns {Promise<object>} A promise that resolves with the parsed AI's response.
-             */
-            async function callGeminiAPI(userQuery, systemInstruction = null, generationConfig = null) {
-                const apiKey = "AIzaSyAVsgP4wvcrkhZchKlv3-5WJEqGW_i-fmU"; // In a real app, this would be handled securely. Left blank for this environment.
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+    const brandSelect = document.getElementById('brand-select');
+    const modelSelect = document.getElementById('model-select');
+    const submodelSelect = document.getElementById('submodel-select');
+    const yearSelect = document.getElementById('year-select');
+    const searchBtn = document.getElementById('search-btn');
+    const backBtn = document.getElementById('back-btn');
+    const backToResultsBtn = document.getElementById('back-to-results-btn');
 
-                const payload = {
-                    contents: [{ parts: [{ text: userQuery }] }],
-                };
+    
+    const navItems = document.querySelectorAll('.nav-item');
+    const navLinkBtns = document.querySelectorAll('.nav-link-btn');
+    const pages = document.querySelectorAll('.page');
+    
+    const loadingIndicator = document.getElementById('loading-indicator');
+    const aiResultsContainer = document.getElementById('ai-results-container');
+    const resultsGrid = document.getElementById('results-grid');
+    const resultTitle = document.getElementById('result-title');
+    const resultOrigin = document.getElementById('result-origin');
+    const brokerCtaContainer = document.getElementById('broker-cta-container');
 
-                if (systemInstruction) {
-                    payload.systemInstruction = systemInstruction;
-                }
-                if (generationConfig) {
-                    payload.generationConfig = generationConfig;
-                }
+    const brokerLoadingIndicator = document.getElementById('broker-loading-indicator');
+    const brokerResultsContainer = document.getElementById('broker-results-container');
 
-                console.log("--- Calling Gemini API ---");
-                console.log("Payload:", JSON.stringify(payload, null, 2));
+    const recentCarsSection = document.getElementById('recent-cars-section');
+    const recentCarsGrid = document.getElementById('recent-cars-grid');
+    const MAX_RECENT_CARS = 5;
 
-                // This is a mocked response for demonstration in an environment without a real API key.
-                // In a live environment, the fetch call below would be used.
-                return mockGeminiResponse(userQuery, generationConfig);
+    // --- Dream Car Finder Elements ---
+    const typeSelect = document.getElementById('type-select');
+    const budgetInput = document.getElementById('budget-input');
+    const brandSelectDream = document.getElementById('brand-select-dream');
+    const yearSelectDream = document.getElementById('year-select-dream');
+    const findDreamCarBtn = document.getElementById('find-dream-car-btn');
+    const backToToolsBtn = document.getElementById('back-to-tools-btn');
+    const dreamcarLoadingIndicator = document.getElementById('dreamcar-loading-indicator');
+    const dreamcarResultsGrid = document.getElementById('dreamcar-results-grid');
 
-                /*
-                // REAL API CALL (commented out for this environment)
-                try {
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
 
-                    if (!response.ok) {
-                        throw new Error(`API call failed with status: ${response.status}`);
-                    }
+    let currentCar = {};
+    const countryCodeMap = { 'Germany': 'DE', 'USA': 'US', 'United Kingdom': 'GB', 'Japan': 'JP', 'Italy': 'IT', 'France': 'FR', 'Sweden': 'SE', 'South Korea': 'KR', 'Spain': 'ES', 'Czech Republic': 'CZ', 'Romania': 'RO' };
 
-                    const result = await response.json();
-                    const candidate = result.candidates?.[0];
+    
+    // --- Navigation Logic ---
+    function switchPage(pageId) {
+        window.scrollTo(0, 0);
+        pages.forEach(page => page.classList.remove('active'));
+        
+        const activePage = document.getElementById(pageId);
+        if (activePage) activePage.classList.add('active');
 
-                    if (candidate && candidate.content?.parts?.[0]?.text) {
-                        return JSON.parse(candidate.content.parts[0].text);
-                    } else {
-                        throw new Error("Invalid response structure from API.");
-                    }
-                } catch (error) {
-                    console.error("Gemini API Error:", error);
-                    throw error; // Re-throw the error to be handled by the caller
-                }
-                */
+        // Only update nav items if it's a main page
+        if (['page-home', 'page-tools', 'page-profile'].includes(pageId)) {
+            navItems.forEach(item => item.classList.remove('active'));
+            const activeNavItem = document.querySelector(`.nav-item[data-page="${pageId}"]`);
+            if (activeNavItem) activeNavItem.classList.add('active');
+        }
+    }
+
+    navItems.forEach(item => item.addEventListener('click', () => switchPage(item.dataset.page)));
+    navLinkBtns.forEach(item => item.addEventListener('click', () => switchPage(item.dataset.page)));
+
+    // --- Search Form Logic ---
+    const brands = Object.keys(carData).sort();
+    brands.forEach(brand => {
+        const option = document.createElement('option');
+        option.value = brand;
+        option.textContent = brand;
+        brandSelect.appendChild(option);
+    });
+
+    brandSelect.addEventListener('change', () => {
+        const selectedBrand = brandSelect.value;
+        modelSelect.innerHTML = '<option value="" disabled selected>Select a model...</option>';
+        submodelSelect.innerHTML = '<option value="" disabled selected>First, select a model</option>';
+        yearSelect.innerHTML = '<option value="" disabled selected>First, select a sub-model</option>';
+        
+        modelSelect.disabled = !selectedBrand;
+        submodelSelect.disabled = true;
+        yearSelect.disabled = true;
+        searchBtn.disabled = true;
+
+        if (selectedBrand && carData[selectedBrand]) {
+            const models = Object.keys(carData[selectedBrand]).sort();
+            models.forEach(model => {
+                const option = document.createElement('option');
+                option.value = model;
+                option.textContent = model;
+                modelSelect.appendChild(option);
+            });
+        }
+    });
+
+    modelSelect.addEventListener('change', () => {
+        const selectedBrand = brandSelect.value;
+        const selectedModel = modelSelect.value;
+        submodelSelect.innerHTML = '<option value="" disabled selected>Select a sub-model...</option>';
+        yearSelect.innerHTML = '<option value="" disabled selected>First, select a sub-model</option>';
+        
+        submodelSelect.disabled = !selectedModel;
+        yearSelect.disabled = true;
+        searchBtn.disabled = true;
+
+        if (selectedBrand && selectedModel && carData[selectedBrand][selectedModel]) {
+            const submodels = Object.keys(carData[selectedBrand][selectedModel]).sort();
+            submodels.forEach(submodel => {
+                const option = document.createElement('option');
+                option.value = submodel;
+                option.textContent = submodel;
+                submodelSelect.appendChild(option);
+            });
+        }
+    });
+
+    submodelSelect.addEventListener('change', () => {
+        const selectedBrand = brandSelect.value;
+        const selectedModel = modelSelect.value;
+        const selectedSubmodel = submodelSelect.value;
+        yearSelect.innerHTML = '<option value="" disabled selected>Select a year...</option>';
+
+        yearSelect.disabled = !selectedSubmodel;
+        searchBtn.disabled = true;
+        
+        if (selectedBrand && selectedModel && selectedSubmodel && carData[selectedBrand][selectedModel][selectedSubmodel]) {
+            const years = carData[selectedBrand][selectedModel][selectedSubmodel].sort((a, b) => b - a);
+            years.forEach(year => {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                yearSelect.appendChild(option);
+            });
+        }
+    });
+
+    yearSelect.addEventListener('change', () => searchBtn.disabled = !yearSelect.value);
+    
+    searchBtn.addEventListener('click', () => {
+        currentCar = {
+            brand: brandSelect.value,
+            model: modelSelect.value,
+            submodel: submodelSelect.value,
+            year: yearSelect.value,
+        };
+        searchVehicle(currentCar);
+    });
+    backBtn.addEventListener('click', () => switchPage('page-tools'));
+    backToResultsBtn.addEventListener('click', () => switchPage('page-results'));
+
+    async function searchVehicle(car) {
+        if (!car.brand || !car.model || !car.submodel || !car.year) {
+            alert("Please select a brand, model, sub-model, and year.");
+            return;
+        }
+
+        switchPage('page-results');
+        loadingIndicator.style.display = 'flex';
+        aiResultsContainer.classList.add('hidden');
+        resultsGrid.innerHTML = '';
+        brokerCtaContainer.innerHTML = '';
+        
+        const prompt = `Act as a car expert. Provide detailed information for the vehicle: ${car.brand} ${car.model} ${car.submodel} (${car.year}).
+
+VERY IMPORTANT: Your response MUST be a single, valid JSON object without any surrounding text or markdown. The JSON object must have the following structure:
+{
+  "short_title": "A short, common name for the car, e.g., 'Mercedes A35 AMG'.",
+  "description": "A brief overview of the vehicle (string).",
+  "expert_review": "A detailed expert review covering driving experience, interior, and reliability (string).",
+  "price": { "new_eur": "e.g., '€85,000'", "used_eur": "e.g., '€60,000 - €75,000'" },
+  "performance": { "power_hp": "e.g., '450'", "top_speed_kmh": "e.g., '290'", "acceleration_sec": "e.g., '4.1'" },
+  "origin": "Country of origin (string).",
+  "rating": "Expert rating out of 5, e.g., '4.7' (string).",
+  "colors": [
+    { "name": "Nardo Gray", "hex": "#8a8d8f" }, { "name": "Mythos Black", "hex": "#1c1c1c" }, { "name": "Tango Red", "hex": "#c50000" }
+  ],
+  "price_history": [
+    { "year": "${parseInt(car.year)}", "price_eur": "e.g., '€65,000'" }, { "year": "${parseInt(car.year) - 1}", "price_eur": "e.g., '€62,000'" }, { "year": "${parseInt(car.year) - 2}", "price_eur": "e.g., '€58,000'" }
+  ],
+  "modifications": [
+    { "name": "Akrapovič Exhaust System", "description": "Titanium exhaust that reduces weight and enhances the engine's sound." }, { "name": "KW Coilover Suspension", "description": "Adjustable suspension for improved handling and lower ride height." }
+  ],
+  "part_prices": {
+    "tire_eur": "e.g., '€250 - €400'", "brake_pads_eur": "e.g., '€150 - €250'"
+  },
+  "tuning_versions": [
+    {
+      "tuner": "e.g., 'ABT Sportsline'",
+      "model_name": "e.g., 'ABT RS6-R'",
+      "description": "A brief summary of the tuning package, highlighting key improvements like power increase, new body kit, etc."
+    }
+  ]
+}
+If a piece of information is not available, return "N/A" for strings, empty arrays [] for lists, or empty objects {} for maps. For "tuning_versions", return an empty array [] if no well-known tuners (like ABT, Brabus, Mansory, Hennessey, etc.) exist for this specific model.`;
+
+        const result = await callGeminiAPI(prompt, searchBtn);
+        
+        saveRecentCar(car);
+        displayRecentCars();
+
+        try {
+            const data = JSON.parse(result);
+            resultTitle.textContent = `${data.short_title || `${car.brand} ${car.model} ${car.submodel}`} (${car.year})`;
+            displayResultsAsCards(data);
+        } catch (e) {
+            console.error("Failed to parse AI response as JSON:", e, "Response was:", result);
+            resultTitle.textContent = `${car.brand} ${car.model} ${car.submodel} (${car.year})`;
+            resultsGrid.innerHTML = `<div class="col-span-1 md:col-span-2 p-4 bg-red-900/20 text-red-300 border border-red-500 rounded-lg">An error occurred while displaying the data. The AI returned an invalid format.</div>`;
+        }
+        
+        loadingIndicator.style.display = 'none';
+        aiResultsContainer.classList.remove('hidden');
+    }
+
+    async function findBroker(car) {
+        switchPage('page-broker');
+        brokerLoadingIndicator.style.display = 'flex';
+        brokerResultsContainer.classList.add('hidden');
+        brokerResultsContainer.innerHTML = '';
+
+        const prompt = `Act as an expert AI car broker from a premium fictional company called 'Quantum Auto Finance'. A client is looking for insurance and financing options for a ${car.year} ${car.brand} ${car.model} ${car.submodel}.
+
+VERY IMPORTANT: Your response MUST be a single, valid JSON object without any surrounding text or markdown. The JSON object must have the following structure:
+{
+  "broker_name": "Quantum Auto Finance",
+  "agent_name": "e.g., 'Alex Cypher'",
+  "agent_contact": {
+    "email": "e.g., 'alex.c@qautofinance.ai'",
+    "phone": "e.g., '+1 (555) 123-4567'"
+  },
+  "insurance_offer": {
+    "provider": "e.g., 'Aura Insurance'",
+    "annual_premium_eur": "e.g., '€1,850'",
+    "coverage_highlights": [
+      "Full Kasko (All-Risk) Coverage",
+      "Theft and Vandalism Protection",
+      "24/7 Roadside Assistance",
+      "Glass Damage Included"
+    ]
+  },
+  "financing_offer": {
+    "provider": "e.g., 'Vector Leasing'",
+    "monthly_rate_eur": "e.g., '€850'",
+    "term_months": "e.g., '60'",
+    "interest_rate_percent": "e.g., '4.5%'",
+    "down_payment_eur": "e.g., '€15,000'"
+  },
+  "summary": "A brief, encouraging summary of the offer."
+}
+If a piece of information is not available, return "N/A" for strings, empty arrays [] for lists, or empty objects {} for maps.`;
+
+        // We can re-use the vehicle search button for loading state, as it's not visible
+        const result = await callGeminiAPI(prompt, document.createElement('button'));
+
+        try {
+            const data = JSON.parse(result);
+            displayBrokerResults(data);
+        } catch(e) {
+            console.error("Failed to parse AI Broker response as JSON:", e, "Response was:", result);
+            brokerResultsContainer.innerHTML = `<div class="col-span-1 md:col-span-2 p-4 bg-red-900/20 text-red-300 border border-red-500 rounded-lg">An error occurred while fetching broker offers. The AI returned an invalid format.</div>`;
+        }
+        
+        brokerLoadingIndicator.style.display = 'none';
+        brokerResultsContainer.classList.remove('hidden');
+    }
+
+    function displayBrokerResults(data) {
+        brokerResultsContainer.innerHTML = '';
+        
+        let content = `
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white">${data.broker_name || 'AI Broker'}</h2>
+                <p class="text-gray-500 dark:text-gray-400">Your personalized offers for the ${currentCar.year} ${currentCar.model}</p>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Insurance Card -->
+                    <div class="gradient-border">
+                        <div class="bg-white dark:bg-black rounded-lg p-6 h-full">
+                            <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Insurance Offer</h3>
+                            <div class="text-gray-600 dark:text-gray-300 space-y-4">
+                                <div>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">Annual Premium</div>
+                                    <div class="text-3xl font-bold text-gray-900 dark:text-white">${data.insurance_offer.annual_premium_eur}</div>
+                                </div>
+                                <div>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">Provider</div>
+                                    <div class="text-lg font-semibold text-gray-900 dark:text-white">${data.insurance_offer.provider}</div>
+                                </div>
+                                <div>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">Highlights</div>
+                                    <ul class="space-y-1">
+                                        ${data.insurance_offer.coverage_highlights.map(item => `<li class="flex items-center"><svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>${item}</li>`).join('')}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Financing Card -->
+                    <div class="gradient-border">
+                        <div class="bg-white dark:bg-black rounded-lg p-6 h-full">
+                            <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Financing Offer</h3>
+                             <div class="text-gray-600 dark:text-gray-300 space-y-4">
+                                <div>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">Monthly Rate</div>
+                                    <div class="text-3xl font-bold text-gray-900 dark:text-white">${data.financing_offer.monthly_rate_eur}</div>
+                                </div>
+                                <div>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">Provider</div>
+                                    <div class="text-lg font-semibold text-gray-900 dark:text-white">${data.financing_offer.provider}</div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 text-sm">
+                                    <div><strong>Term:</strong> ${data.financing_offer.term_months} months</div>
+                                    <div><strong>Interest:</strong> ${data.financing_offer.interest_rate_percent}</div>
+                                    <div class="col-span-2"><strong>Down Payment:</strong> ${data.financing_offer.down_payment_eur}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                 <!-- Contact Card -->
+                <div class="bg-gray-50 dark:bg-gray-800/50 p-6 rounded-xl border border-gray-200 dark:border-gray-700 h-full">
+                     <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Your AI Agent</h3>
+                     <div class="space-y-4">
+                        <div>
+                            <div class="text-sm text-gray-500 dark:text-gray-400">Name</div>
+                            <div class="text-lg font-semibold text-gray-900 dark:text-white">${data.agent_name}</div>
+                        </div>
+                        <div>
+                            <div class="text-sm text-gray-500 dark:text-gray-400">Email</div>
+                            <div class="text-lg font-semibold text-gray-900 dark:text-white">${data.agent_contact.email}</div>
+                        </div>
+                         <div>
+                            <div class="text-sm text-gray-500 dark:text-gray-400">Phone</div>
+                            <div class="text-lg font-semibold text-gray-900 dark:text-white">${data.agent_contact.phone}</div>
+                        </div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 pt-4">${data.summary}</p>
+                     </div>
+                </div>
+            </div>
+        `;
+        brokerResultsContainer.innerHTML = content;
+    }
+
+    function getCountryFlagEmoji(country) {
+        const code = countryCodeMap[country];
+        if (!code) return '';
+        return String.fromCodePoint(...[...code.toUpperCase()].map(c => c.charCodeAt(0) + 127397));
+    }
+
+    function displayResultsAsCards(data) {
+        resultsGrid.innerHTML = ''; 
+        
+        let cleanOrigin = data.origin || '';
+        // Fix potential AI errors like "deGermany"
+        for (const [countryName, code] of Object.entries(countryCodeMap)) {
+            if (cleanOrigin.toLowerCase().includes(countryName.toLowerCase())) {
+                cleanOrigin = countryName; // Standardize to the correct name, e.g., "Germany"
+                break;
             }
+        }
+        
+        const flag = getCountryFlagEmoji(cleanOrigin);
+        resultOrigin.textContent = cleanOrigin ? `${flag} ${cleanOrigin}` : '';
+
+        const createCard = (title, content, cardClasses = '') => {
+            const cardWrapper = document.createElement('div');
+            cardWrapper.className = `gradient-border ${cardClasses}`;
+            cardWrapper.innerHTML = `<div class="bg-white dark:bg-black rounded-lg p-6 h-full flex flex-col"><h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4">${title}</h3><div class="text-gray-600 dark:text-gray-300 flex-grow">${content}</div></div>`;
+            return cardWrapper;
+        };
+
+        const createStat = (label, value, unit, iconSvg) => {
+            if (!value || value === 'N/A') return '';
+            return `<div class="text-center">${iconSvg}<div class="text-sm text-gray-500 dark:text-gray-400 uppercase tracking-wider">${label}</div><div class="text-3xl font-bold text-gray-900 dark:text-white mt-1">${value}<span class="text-xl ml-1 font-medium text-gray-500 dark:text-gray-400">${unit}</span></div></div>`;
+        };
+
+        const createStarRating = (rating) => {
+            const numRating = parseFloat(rating);
+            if (isNaN(numRating)) return '<span>N/A</span>';
+            let stars = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= numRating) stars += `<svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>`;
+                else stars += `<svg class="w-5 h-5 text-gray-300 dark:text-gray-600" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>`;
+            }
+            return `<div class="flex items-center">${stars}<span class="ml-2 text-gray-500 dark:text-gray-400">${numRating.toFixed(1)}/5.0</span></div>`;
+        };
+
+        if (data.description) resultsGrid.appendChild(createCard('General Overview', `<p>${data.description}</p>`, 'md:col-span-2'));
+        if (data.expert_review) resultsGrid.appendChild(createCard('Expert Review', `<p>${data.expert_review}</p>`, 'md:col-span-2'));
+
+        if (data.performance) {
+            const powerIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-2 h-6 w-6 text-violet-400"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`;
+            const speedIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-2 h-6 w-6 text-violet-400"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>`;
+            const accelIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-2 h-6 w-6 text-violet-400"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 1"/><path d="M5 3 2 6"/></svg>`;
+            const statsContent = `<div class="flex justify-around items-start h-full space-x-4">${createStat('Power', data.performance.power_hp, 'HP', powerIcon)}${createStat('Top Speed', data.performance.top_speed_kmh, 'km/h', speedIcon)}${createStat('0-100 km/h', data.performance.acceleration_sec, 's', accelIcon)}</div>`;
+            resultsGrid.appendChild(createCard('Performance', statsContent, 'md:col-span-2'));
+        }
+        
+        if (data.price) {
+            const content = `<div class="flex flex-col space-y-4"><div><div class="text-sm text-gray-500 dark:text-gray-400">Price (New)</div><div class="text-2xl font-bold text-gray-900 dark:text-white">${data.price.new_eur || 'N/A'}</div></div><div><div class="text-sm text-gray-500 dark:text-gray-400">Price (Used)</div><div class="text-2xl font-bold text-gray-900 dark:text-white">${data.price.used_eur || 'N/A'}</div></div></div>`;
+            resultsGrid.appendChild(createCard('Price', content));
+        }
+
+        if (data.rating) resultsGrid.appendChild(createCard('Expert Rating', createStarRating(data.rating)));
+        
+        if (data.colors && data.colors.length > 0) {
+            const colorsHtml = data.colors.map(c => `<div class="flex items-center"><span class="w-6 h-6 rounded-full border-2 border-white/20 mr-3" style="background-color: ${c.hex};"></span><span>${c.name}</span></div>`).join('');
+            resultsGrid.appendChild(createCard('Available Colors', `<div class="flex flex-col space-y-2">${colorsHtml}</div>`));
+        }
+
+        if (data.price_history && data.price_history.length > 0) {
+            const historyHtml = data.price_history.map(p => `<li class="flex justify-between"><span>${p.year}</span><span class="font-semibold">${p.price_eur}</span></li>`).join('');
+            resultsGrid.appendChild(createCard('Price Over Time', `<ul class="space-y-2">${historyHtml}</ul>`));
+        }
+        
+        if (data.modifications && data.modifications.length > 0) {
+            const modsHtml = data.modifications.map(m => `<div><h4 class="font-semibold text-white">${m.name}</h4><p class="text-sm">${m.description}</p></div>`).join('');
+            resultsGrid.appendChild(createCard('Popular Modifications', `<div class="space-y-3">${modsHtml}</div>`, 'md:col-span-2'));
+        }
+
+        if (data.part_prices && Object.keys(data.part_prices).length > 0) {
+            const partsHtml = Object.entries(data.part_prices).map(([key, value]) => `<li class="flex justify-between"><span class="capitalize">${key.replace('_eur', '').replace('_', ' ')}</span><span class="font-semibold">${value}</span></li>`).join('');
+            resultsGrid.appendChild(createCard('Common Part Prices', `<ul class="space-y-2">${partsHtml}</ul>`, 'md:col-span-2'));
+        }
+        
+        if (data.tuning_versions && data.tuning_versions.length > 0) {
+            const tuningHtml = data.tuning_versions.map(t => `
+                <div>
+                    <h4 class="font-semibold text-white">${t.tuner} - ${t.model_name}</h4>
+                    <p class="text-sm">${t.description}</p>
+                </div>
+            `).join('');
+            resultsGrid.appendChild(createCard('Famous Tuning Versions', `<div class="space-y-4">${tuningHtml}</div>`, 'md:col-span-2'));
+        }
+
+        // Add Broker CTA button
+        const brokerBtn = document.createElement('button');
+        brokerBtn.id = 'find-broker-btn';
+        brokerBtn.className = 'w-full max-w-sm mx-auto animated-gradient text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 flex items-center justify-center space-x-2';
+        brokerBtn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>Find AI Broker & Offers</span>
+        `;
+        brokerBtn.onclick = () => findBroker(currentCar);
+        brokerCtaContainer.innerHTML = '';
+        brokerCtaContainer.appendChild(brokerBtn);
+    }
+
+    // --- Local Storage Logic for Recent Cars ---
+    function getRecentCars() { return JSON.parse(localStorage.getItem('recentCars')) || []; }
+
+    function saveRecentCar(car) {
+        let recentCars = getRecentCars();
+        recentCars = recentCars.filter(c => !(c.brand === car.brand && c.model === car.model && c.submodel === car.submodel && c.year === car.year));
+        recentCars.unshift(car);
+        localStorage.setItem('recentCars', JSON.stringify(recentCars.slice(0, MAX_RECENT_CARS)));
+    }
+
+    function displayRecentCars() {
+        const recentCars = getRecentCars();
+        if (recentCars.length === 0) {
+            recentCarsSection.classList.add('hidden');
+            return;
+        }
+        recentCarsSection.classList.remove('hidden');
+        recentCarsGrid.innerHTML = '';
+        recentCars.forEach(car => {
+            const card = document.createElement('button');
+            card.className = 'bg-gray-100 dark:bg-gray-800 p-4 rounded-lg text-left hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors';
+            card.innerHTML = `<div class="font-bold text-gray-900 dark:text-white">${car.brand} ${car.model}</div><div class="text-sm text-gray-500 dark:text-gray-400">${car.submodel} (${car.year})</div>`;
+            card.onclick = () => {
+                brandSelect.value = car.brand;
+                brandSelect.dispatchEvent(new Event('change'));
+                modelSelect.value = car.model;
+                modelSelect.dispatchEvent(new Event('change'));
+                submodelSelect.value = car.submodel;
+                submodelSelect.dispatchEvent(new Event('change'));
+                yearSelect.value = car.year;
+                yearSelect.dispatchEvent(new Event('change'));
+                currentCar = car;
+                searchVehicle(currentCar);
+            };
+            recentCarsGrid.appendChild(card);
+        });
+    }
+
+    async function callGeminiAPI(prompt, button) {
+        const originalButtonText = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = 'Searching...';
+
+        try {
+            const apiKey = "AIzaSyAVsgP4wvcrkhZchKlv3-5WJEqGW_i-fmU";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            const payload = { contents: [{ parts: [{ text: prompt }] }] };
+            const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            if (!response.ok) { throw new Error(`API call failed: ${response.status}`); }
+            const result = await response.json();
+            const candidate = result.candidates?.[0];
+            let text = (candidate && candidate.content?.parts?.[0]?.text) ? candidate.content.parts[0].text : '{}';
+            const jsonMatch = text.match(/\{[\s\S]*\}/);
+            return jsonMatch ? jsonMatch[0] : '{}';
+        } catch (error) {
+            console.error('Error calling Gemini API:', error);
+            return `{"description": "An error occurred. Please check the console for details."}`;
+        } finally {
+            button.disabled = false;
+            button.innerHTML = originalButtonText;
+        }
+    }
+    
+    // --- Dream Car Finder Logic ---
+    function setupDreamCarFinder() {
+        const carTypes = ['Hatchback', 'Sedan', 'Estate', 'SUV', 'Coupe', 'Convertible', 'Minivan', 'Pickup Truck', 'Sports Car', 'Supercar'];
+        carTypes.forEach(type => {
+            const option = document.createElement('option');
+            option.value = type;
+            option.textContent = type;
+            typeSelect.appendChild(option);
+        });
+
+        brands.forEach(brand => {
+            const option = document.createElement('option');
+            option.value = brand;
+            option.textContent = brand;
+            brandSelectDream.appendChild(option);
+        });
+        
+        const currentYear = new Date().getFullYear() + 1;
+        for (let year = currentYear; year >= 1950; year--) {
+            const option = document.createElement('option');
+            option.value = year;
+            option.textContent = year;
+            yearSelectDream.appendChild(option);
+        }
+
+        findDreamCarBtn.addEventListener('click', findDreamCar);
+        backToToolsBtn.addEventListener('click', () => switchPage('page-tools'));
+    }
+
+    async function findDreamCar() {
+        const criteria = {
+            type: typeSelect.value,
+            budget: budgetInput.value,
+            brand: brandSelectDream.value,
+            year: yearSelectDream.value,
+        };
+
+        switchPage('page-dreamcar-results');
+        dreamcarLoadingIndicator.style.display = 'flex';
+        dreamcarResultsGrid.classList.add('hidden');
+        dreamcarResultsGrid.innerHTML = '';
+
+        const prompt = `Act as a world-class car expert. A user is looking for their dream car based on some criteria. Your task is to recommend the top 3 best matching cars available on the market (new or used).
+The user's criteria are:
+- Car Type: ${criteria.type || 'Any'}
+- Maximum Budget: ${criteria.budget ? `€${criteria.budget}` : 'Any'}
+- Brand: ${criteria.brand || 'Any'}
+- Minimum Year: ${criteria.year || 'Any'}
+
+VERY IMPORTANT: Your response MUST be a single, valid JSON object without any surrounding text or markdown. The JSON object must have a key "recommendations" which is an array of exactly 3 car objects. Each car object must have the following structure:
+{
+  "brand": "e.g., 'Volkswagen'",
+  "model": "e.g., 'Golf'",
+  "submodel": "The most representative sub-model/trim for this recommendation, e.g., 'GTI'",
+  "year": "A single, representative year from the year_range, e.g., '2019'",
+  "year_range": "e.g., '2018-2020'",
+  "price_eur": "e.g., '€23,000'",
+  "type": "e.g., 'Hatchback'",
+  "reasoning": "A short, compelling paragraph explaining why this car is a great match for the user's criteria, highlighting its key strengths."
+}
+Provide diverse and interesting recommendations.`;
+
+        const result = await callGeminiAPI(prompt, findDreamCarBtn);
+        
+        try {
+            const data = JSON.parse(result);
+            displayDreamCarResults(data.recommendations || []);
+        } catch (e) {
+            console.error("Failed to parse Dream Car AI response as JSON:", e, "Response was:", result);
+            dreamcarResultsGrid.innerHTML = `<div class="col-span-1 lg:col-span-3 p-4 bg-red-900/20 text-red-300 border border-red-500 rounded-lg">An error occurred while finding your dream car. The AI returned an invalid format.</div>`;
+        }
+        
+        dreamcarLoadingIndicator.style.display = 'none';
+        dreamcarResultsGrid.classList.remove('hidden');
+    }
+
+    function displayDreamCarResults(recommendations) {
+        dreamcarResultsGrid.innerHTML = '';
+        if (!recommendations || recommendations.length === 0) {
+            dreamcarResultsGrid.innerHTML = `<div class="col-span-1 lg:col-span-3 text-center text-gray-500 dark:text-gray-400">The AI couldn't find any matches. Please try different criteria.</div>`;
+            return;
+        }
+
+        recommendations.forEach(car => {
+            const card = document.createElement('button');
+            card.className = 'bg-gray-50 dark:bg-gray-800/50 p-6 rounded-xl border border-gray-200 dark:border-gray-700 flex flex-col text-left hover:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all';
             
-            /**
-             * Mocks the Gemini API response for demonstration purposes.
-             */
-            async function mockGeminiResponse(userQuery, generationConfig) {
-                 await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate network delay
+            const carName = `${car.brand} ${car.model}`;
+            const placeholderImageUrl = `https://placehold.co/600x400/1a1a1a/ffffff?text=${encodeURIComponent(carName)}`;
+            
+            card.innerHTML = `
+                <img src="${placeholderImageUrl}" alt="Image of ${carName}" class="w-full h-40 object-cover rounded-lg mb-4">
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white">${carName}</h3>
+                <div class="text-sm text-gray-500 dark:text-gray-400 mb-3">${car.type} | ${car.year_range}</div>
+                <div class="text-2xl font-bold text-gray-800 dark:text-white mb-4">${car.price_eur}</div>
+                <p class="text-gray-600 dark:text-gray-300 text-sm flex-grow">${car.reasoning}</p>
+            `;
 
-                if (generationConfig && generationConfig.responseMimeType === 'application/json') {
-                    if (userQuery.includes("generate new daily quests")) {
-                        return [
-                           { icon: 'zap', color: 'text-yellow-400', title: 'Quick Sprint', description: 'Do a 1-minute plank', xp: 30, coins: 15 },
-                           { icon: 'message-square', color: 'text-green-400', title: 'Social Connect', description: 'Message a friend you haven\'t spoken to', xp: 35, coins: 20 },
-                           { icon: 'trash-2', color: 'text-purple-400', title: 'Tidy Up', description: 'Declutter one small area for 5 minutes', xp: 20, coins: 10 }
-                       ];
-                    }
-                    if (userQuery.startsWith("Break down this goal:")) {
-                        return [
-                            { title: "Research recipes", description: "Find 3 interesting recipes online." },
-                            { title: "Shop for ingredients", description: "Create a list and buy all needed items." },
-                            { title: "Prep the ingredients", description: "Wash, chop, and measure everything." },
-                            { title: "Follow the recipe", description: "Cook your first amazing meal!" }
-                        ];
-                    }
-                    if (userQuery.startsWith("Analyze this journal entry:")) {
-                        return {
-                            summary: "It sounds like you had a really effective day, balancing productivity with self-awareness about your energy levels. That's a great skill!",
-                            win: "Pushing through your workout even when you felt tired is a huge accomplishment. That shows real dedication!",
-                            suggested_quest: {
-                                title: "Mindful Break",
-                                description: "Schedule a 10-minute break in the afternoon to just relax, stretch, or meditate."
-                            }
-                        };
-                    }
-                    if (userQuery.startsWith("Generate a micro-lesson about:")) {
-                        return {
-                            title: "Black Holes: Gravity's Ultimate Mystery",
-                            content: "Imagine an object so massive and dense that nothing, not even light, can escape its gravitational pull. That's a black hole! They form when giant stars collapse under their own weight.\n\nAt the center is a 'singularity,' a point of infinite density. While you can't see a black hole directly, scientists can detect them by observing their powerful effects on nearby stars and gas. They are one of the most fascinating and mysterious objects in the universe!"
-                        };
-                    }
-                     if (userQuery.startsWith("Analyze these expenses:")) {
-                        return {
-                            categorized_expenses: [
-                                { expense: "Coffee", category: "Food & Drink" },
-                                { expense: "Groceries", category: "Groceries" },
-                                { expense: "Netflix", category: "Entertainment" },
-                                { expense: "Gas", category: "Transportation" }
-                            ],
-                            summary: "Your main spending categories this week are Groceries and Transportation.",
-                            tip: "Making coffee at home is a simple way to save a little extra each week. It adds up!"
-                        };
-                    }
+            card.onclick = () => {
+                if (car.brand && car.model && car.submodel && car.year) {
+                    const carDetails = {
+                        brand: car.brand,
+                        model: car.model,
+                        submodel: car.submodel,
+                        year: car.year
+                    };
+                    currentCar = carDetails;
+                    searchVehicle(carDetails);
+                } else {
+                    alert("Sorry, detailed information for this specific recommendation is not available.");
+                    console.error("Missing detailed data from dream car recommendation:", car);
                 }
-                
-                // Default text responses
-                const lowerCaseQuery = userQuery.toLowerCase();
-                if (lowerCaseQuery.includes("hello") || lowerCaseQuery.includes("hi")) {
-                    return { text: "Hey there! Ready to conquer your day? What's our first mission? 🚀" };
-                }
-                return { text: "That's an interesting goal! Let's break it down. What's one tiny thing you could do in the next 10 minutes to move towards it?" };
-            }
-
-
-            // --- UI Elements ---
-            const mainApp = document.getElementById('main-app');
-            const navItems = document.querySelectorAll('.nav-item');
-            const contentScreens = {
-                'home-screen': document.getElementById('home-screen-content'),
-                'chat-screen': document.getElementById('chat-screen-content'),
-                'modules-screen': document.getElementById('modules-screen-content'),
-                'profile-screen': document.getElementById('profile-screen-content'),
             };
 
-            // --- Daily Quests Elements & Logic ---
-            const questsList = document.getElementById('daily-quests-list');
-            const generateQuestsBtn = document.getElementById('generate-quests-btn');
-            const questsLoader = document.getElementById('quests-loader');
-
-            function renderQuests() {
-                questsList.innerHTML = '';
-                if (!dailyQuests || dailyQuests.length === 0) return;
-                dailyQuests.forEach(quest => {
-                    const questEl = document.createElement('div');
-                    questEl.className = 'flex items-center justify-between p-3 bg-gray-900 rounded-lg chat-bubble';
-                    questEl.innerHTML = `
-                        <div class="flex items-center">
-                            <i data-lucide="${quest.icon}" class="w-6 h-6 mr-3 ${quest.color}"></i>
-                            <div>
-                                <p class="font-medium">${quest.title}</p>
-                                <p class="text-xs text-gray-400">${quest.description}</p>
-                            </div>
-                        </div>
-                        <p class="font-bold text-sm">+${quest.xp} XP | +${quest.coins} 🪙</p>
-                    `;
-                    questsList.appendChild(questEl);
-                });
-                lucide.createIcons();
-            }
-
-            generateQuestsBtn.addEventListener('click', async () => {
-                questsList.innerHTML = '';
-                questsLoader.classList.remove('hidden');
-                
-                const systemInstruction = { parts: [{ text: "You are a fun, gamified life coach AI. Generate a JSON array of 3 new, unique, and actionable daily quests." }] };
-                const userQuery = "Please generate new daily quests for me.";
-                const generationConfig = {
-                  responseMimeType: "application/json",
-                  responseSchema: {
-                    type: "ARRAY",
-                    items: {
-                      type: "OBJECT",
-                      properties: {
-                        icon: { type: "STRING" },
-                        color: { type: "STRING" },
-                        title: { type: "STRING" },
-                        description: { type: "STRING" },
-                        xp: { type: "NUMBER" },
-                        coins: { type: "NUMBER" },
-                      },
-                    },
-                  },
-                };
-
-                try {
-                    const response = await callGeminiAPI(userQuery, systemInstruction, generationConfig);
-                    dailyQuests = response;
-                    renderQuests();
-                } catch (error) {
-                    console.error("Failed to generate quests:", error);
-                } finally {
-                    questsLoader.classList.add('hidden');
-                }
-            });
-
-            // --- Goal Breakdown Logic ---
-            const goalModal = document.getElementById('goal-breakdown-modal');
-            const breakdownBtn = document.getElementById('breakdown-goal-btn');
-            const closeGoalBtn = document.getElementById('close-goal-modal');
-            const goalInput = document.getElementById('goal-input');
-            const generateTasksBtn = document.getElementById('generate-tasks-btn');
-            const taskResultsList = document.getElementById('task-results-list');
-            const goalLoader = document.getElementById('goal-loader');
-
-            breakdownBtn.addEventListener('click', () => goalModal.classList.remove('hidden'));
-            closeGoalBtn.addEventListener('click', () => goalModal.classList.add('hidden'));
-
-            generateTasksBtn.addEventListener('click', async () => {
-                const goal = goalInput.value.trim();
-                if (!goal) return;
-
-                taskResultsList.innerHTML = '';
-                goalLoader.classList.remove('hidden');
-                generateTasksBtn.disabled = true;
-
-                const systemInstruction = { parts: [{ text: "You are a productivity AI that breaks large user goals into a JSON array of small, actionable tasks. Each task should be an object with 'title' and 'description'." }] };
-                const userQuery = `Break down this goal: "${goal}"`;
-                const generationConfig = {
-                  responseMimeType: "application/json",
-                  responseSchema: {
-                    type: "ARRAY",
-                    items: {
-                      type: "OBJECT",
-                      properties: {
-                        title: { type: "STRING" },
-                        description: { type: "STRING" },
-                      },
-                    },
-                  },
-                };
-                
-                try {
-                    const tasks = await callGeminiAPI(userQuery, systemInstruction, generationConfig);
-                    renderGeneratedTasks(tasks);
-                } catch (error) {
-                    console.error("Failed to break down goal:", error);
-                    taskResultsList.innerHTML = `<p class="text-red-400 text-center">Could not generate quests. Please try again.</p>`;
-                } finally {
-                    goalLoader.classList.add('hidden');
-                    generateTasksBtn.disabled = false;
-                }
-            });
-
-            function renderGeneratedTasks(tasks) {
-                taskResultsList.innerHTML = '';
-                if (!tasks || tasks.length === 0) return;
-                tasks.forEach(task => {
-                    const taskEl = document.createElement('div');
-                    taskEl.className = 'flex items-center justify-between p-3 bg-gray-900 rounded-lg chat-bubble';
-                    taskEl.innerHTML = `
-                        <div>
-                            <p class="font-medium">${task.title}</p>
-                            <p class="text-xs text-gray-400">${task.description}</p>
-                        </div>
-                        <button class="text-sm gradient-text font-semibold hover:opacity-80 transition-opacity">Add</button>
-                    `;
-                    taskResultsList.appendChild(taskEl);
-                });
-            }
-
-
-            // --- Daily Reflection Logic ---
-            const reflectionModal = document.getElementById('reflection-modal');
-            const openReflectionBtn = document.getElementById('open-reflection-btn');
-            const closeReflectionModalBtn = document.getElementById('close-reflection-modal');
-            const reflectionInput = document.getElementById('reflection-input');
-            const generateReflectionBtn = document.getElementById('generate-reflection-btn');
-            const reflectionLoader = document.getElementById('reflection-loader');
-            const reflectionResults = document.getElementById('reflection-results');
-
-            openReflectionBtn.addEventListener('click', () => reflectionModal.classList.remove('hidden'));
-            closeReflectionModalBtn.addEventListener('click', () => reflectionModal.classList.add('hidden'));
-            
-            generateReflectionBtn.addEventListener('click', async () => {
-                const entry = reflectionInput.value.trim();
-                if (!entry) return;
-
-                reflectionResults.classList.add('hidden');
-                reflectionLoader.classList.remove('hidden');
-                generateReflectionBtn.disabled = true;
-
-                const systemInstruction = { parts: [{ text: "You are a supportive and insightful AI coach. Analyze the user's journal entry and respond in a JSON object format with three keys: 'summary' (a brief, encouraging summary of their day), 'win' (identify one positive accomplishment or 'win'), and 'suggested_quest' (an object with a 'title' and 'description' for a simple, relevant task for tomorrow)." }] };
-                const userQuery = `Analyze this journal entry: "${entry}"`;
-                const generationConfig = {
-                  responseMimeType: "application/json",
-                  responseSchema: {
-                    type: "OBJECT",
-                    properties: {
-                      summary: { type: "STRING" },
-                      win: { type: "STRING" },
-                      suggested_quest: {
-                        type: "OBJECT",
-                        properties: {
-                          title: { type: "STRING" },
-                          description: { type: "STRING" },
-                        },
-                      },
-                    },
-                  },
-                };
-
-                try {
-                    const insight = await callGeminiAPI(userQuery, systemInstruction, generationConfig);
-                    renderReflectionResults(insight);
-                } catch (error) {
-                    console.error("Failed to generate reflection:", error);
-                    reflectionResults.innerHTML = `<p class="text-red-400 text-center">Could not get insights. Please try again.</p>`;
-                    reflectionResults.classList.remove('hidden');
-                } finally {
-                    reflectionLoader.classList.add('hidden');
-                    generateReflectionBtn.disabled = false;
-                }
-            });
-
-            function renderReflectionResults(insight) {
-                if (!insight) return;
-                reflectionResults.innerHTML = `
-                    <div>
-                        <h4 class="font-semibold gradient-text">Summary of Your Day</h4>
-                        <p class="text-sm text-gray-300 mt-1">${insight.summary}</p>
-                    </div>
-                    <div>
-                        <h4 class="font-semibold gradient-text">Today's Epic Win! 🏆</h4>
-                        <p class="text-sm text-gray-300 mt-1">${insight.win}</p>
-                    </div>
-                    <div>
-                        <h4 class="font-semibold gradient-text">A Quest for Tomorrow</h4>
-                        <div class="flex items-center justify-between p-3 mt-1 bg-gray-900 rounded-lg">
-                            <div>
-                                <p class="font-medium">${insight.suggested_quest.title}</p>
-                                <p class="text-xs text-gray-400">${insight.suggested_quest.description}</p>
-                            </div>
-                            <button class="text-sm gradient-text font-semibold hover:opacity-80 transition-opacity">Add</button>
-                        </div>
-                    </div>
-                `;
-                reflectionResults.classList.remove('hidden');
-            }
-
-
-            // --- AI Learning Logic ---
-            const learningModal = document.getElementById('learning-modal');
-            const openLearningBtn = document.getElementById('open-learning-btn');
-            const closeLearningModalBtn = document.getElementById('close-learning-modal');
-            const learningTopicInput = document.getElementById('learning-topic-input');
-            const generateLessonBtn = document.getElementById('generate-lesson-btn');
-            const learningLoader = document.getElementById('learning-loader');
-            const learningResults = document.getElementById('learning-results');
-
-            openLearningBtn.addEventListener('click', () => learningModal.classList.remove('hidden'));
-            closeLearningModalBtn.addEventListener('click', () => learningModal.classList.add('hidden'));
-
-            generateLessonBtn.addEventListener('click', async () => {
-                const topic = learningTopicInput.value.trim();
-                if (!topic) return;
-
-                learningResults.classList.add('hidden');
-                learningLoader.classList.remove('hidden');
-                generateLessonBtn.disabled = true;
-
-                const systemInstruction = { parts: [{ text: "You are an AI tutor that creates engaging, bite-sized micro-lessons (under 150 words) on any topic. Respond in a JSON object format with two keys: 'title' (a catchy title for the lesson) and 'content' (the lesson text, using newline characters for paragraphs). Make the content easy to understand for a general audience." }] };
-                const userQuery = `Generate a micro-lesson about: "${topic}"`;
-                const generationConfig = {
-                  responseMimeType: "application/json",
-                  responseSchema: {
-                    type: "OBJECT",
-                    properties: {
-                      title: { type: "STRING" },
-                      content: { type: "STRING" },
-                    },
-                  },
-                };
-
-                try {
-                    const lesson = await callGeminiAPI(userQuery, systemInstruction, generationConfig);
-                    renderMicroLesson(lesson);
-                } catch (error) {
-                    console.error("Failed to generate lesson:", error);
-                    learningResults.innerHTML = `<p class="text-red-400 text-center">Could not generate lesson. Please try again.</p>`;
-                    learningResults.classList.remove('hidden');
-                } finally {
-                    learningLoader.classList.add('hidden');
-                    generateLessonBtn.disabled = false;
-                }
-            });
-
-            function renderMicroLesson(lesson) {
-                if (!lesson) return;
-                const formattedContent = lesson.content.replace(/\n/g, '<br><br>');
-                learningResults.innerHTML = `
-                    <h3 class="text-xl font-bold gradient-text mb-3">${lesson.title}</h3>
-                    <p class="text-sm text-gray-300 leading-relaxed">${formattedContent}</p>
-                    <button class="w-full text-center mt-4 text-sm bg-gray-800 text-white font-semibold py-2 px-3 rounded-md hover:bg-gray-700 transition-colors">Mark as Complete (+15 XP)</button>
-                `;
-                learningResults.classList.remove('hidden');
-            }
-            
-            // --- AI Finance Logic ---
-            const financeModal = document.getElementById('finance-analysis-modal');
-            const openFinanceBtn = document.getElementById('open-finance-btn');
-            const closeFinanceModalBtn = document.getElementById('close-finance-modal');
-            const financeInput = document.getElementById('finance-input');
-            const generateFinanceInsightBtn = document.getElementById('generate-finance-insight-btn');
-            const financeLoader = document.getElementById('finance-loader');
-            const financeResults = document.getElementById('finance-results');
-
-            openFinanceBtn.addEventListener('click', () => financeModal.classList.remove('hidden'));
-            closeFinanceModalBtn.addEventListener('click', () => financeModal.classList.add('hidden'));
-
-            generateFinanceInsightBtn.addEventListener('click', async () => {
-                const expenses = financeInput.value.trim();
-                if (!expenses) return;
-
-                financeResults.classList.add('hidden');
-                financeLoader.classList.remove('hidden');
-                generateFinanceInsightBtn.disabled = true;
-
-                const systemInstruction = { parts: [{ text: "You are an expert financial advisor AI. Analyze the user's list of expenses. Categorize each expense and provide a brief summary and one actionable saving tip. Respond in a JSON object format." }] };
-                const userQuery = `Analyze these expenses:\n${expenses}`;
-                const generationConfig = {
-                  responseMimeType: "application/json",
-                  responseSchema: {
-                    type: "OBJECT",
-                    properties: {
-                      categorized_expenses: {
-                        type: "ARRAY",
-                        items: {
-                          type: "OBJECT",
-                          properties: {
-                            expense: { type: "STRING" },
-                            category: { type: "STRING" }
-                          }
-                        }
-                      },
-                      summary: { type: "STRING" },
-                      tip: { type: "STRING" }
-                    }
-                  }
-                };
-
-                try {
-                    const insight = await callGeminiAPI(userQuery, systemInstruction, generationConfig);
-                    renderFinanceAnalysis(insight);
-                } catch (error) {
-                    console.error("Failed to generate finance insight:", error);
-                    financeResults.innerHTML = `<p class="text-red-400 text-center">Could not analyze expenses. Please try again.</p>`;
-                    financeResults.classList.remove('hidden');
-                } finally {
-                    financeLoader.classList.add('hidden');
-                    generateFinanceInsightBtn.disabled = false;
-                }
-            });
-
-            function renderFinanceAnalysis(insight) {
-                if (!insight) return;
-
-                let categoriesHTML = insight.categorized_expenses.map(item => `
-                    <div class="flex justify-between items-center text-sm p-2 bg-gray-900 rounded-md">
-                        <span>${item.expense}</span>
-                        <span class="font-semibold text-gray-400">${item.category}</span>
-                    </div>
-                `).join('');
-
-                financeResults.innerHTML = `
-                    <div>
-                        <h4 class="font-semibold gradient-text">Expense Categories</h4>
-                        <div class="mt-2 space-y-1">${categoriesHTML}</div>
-                    </div>
-                    <div>
-                        <h4 class="font-semibold gradient-text">AI Summary</h4>
-                        <p class="text-sm text-gray-300 mt-1">${insight.summary}</p>
-                    </div>
-                    <div>
-                        <h4 class="font-semibold gradient-text">Savings Tip 💡</h4>
-                        <p class="text-sm text-gray-300 mt-1">${insight.tip}</p>
-                    </div>
-                `;
-                financeResults.classList.remove('hidden');
-            }
-
-            // --- Premium Features Logic ---
-            const premiumModal = document.getElementById('premium-modal');
-            const analyticsModal = document.getElementById('analytics-modal');
-            const avatarModal = document.getElementById('avatar-modal');
-            const groupQuestModal = document.getElementById('group-quest-modal');
-            
-            const upgradePremiumBtn = document.getElementById('upgrade-premium-btn');
-            const closePremiumModalBtn = document.getElementById('close-premium-modal');
-            const closeAnalyticsModalBtn = document.getElementById('close-analytics-modal');
-            const closeAvatarModalBtn = document.getElementById('close-avatar-modal');
-            const closeGroupQuestModalBtn = document.getElementById('close-group-quest-modal');
-
-            const analyticsBtn = document.getElementById('analytics-btn');
-            const avatarBtn = document.getElementById('avatar-btn');
-            const openGroupQuestBtn = document.getElementById('open-group-quest-btn');
-            const devUnlockPremiumBtn = document.getElementById('dev-unlock-premium');
-            
-            function handlePremiumFeatureClick(modal) {
-                if(isPremium) {
-                    modal.classList.remove('hidden');
-                } else {
-                    premiumModal.classList.remove('hidden');
-                }
-            }
-
-            analyticsBtn.addEventListener('click', (e) => { e.preventDefault(); handlePremiumFeatureClick(analyticsModal); });
-            avatarBtn.addEventListener('click', (e) => { e.preventDefault(); handlePremiumFeatureClick(avatarModal); });
-            openGroupQuestBtn.addEventListener('click', (e) => { e.preventDefault(); handlePremiumFeatureClick(groupQuestModal); });
-
-            upgradePremiumBtn.addEventListener('click', () => premiumModal.classList.remove('hidden'));
-            closePremiumModalBtn.addEventListener('click', () => premiumModal.classList.add('hidden'));
-            closeAnalyticsModalBtn.addEventListener('click', () => analyticsModal.classList.add('hidden'));
-            closeAvatarModalBtn.addEventListener('click', () => avatarModal.classList.add('hidden'));
-            closeGroupQuestModalBtn.addEventListener('click', () => groupQuestModal.classList.add('hidden'));
-
-            function updatePremiumUI() {
-                const premiumSections = document.querySelectorAll('.premium-locked');
-                if (isPremium) {
-                    premiumSections.forEach(el => el.classList.remove('premium-locked'));
-                    upgradePremiumBtn.classList.add('hidden');
-                } else {
-                    premiumSections.forEach(el => el.classList.add('premium-locked'));
-                    upgradePremiumBtn.classList.remove('hidden');
-                }
-                lucide.createIcons();
-            }
-
-            devUnlockPremiumBtn.addEventListener('click', () => {
-                isPremium = !isPremium;
-                updatePremiumUI();
-                premiumModal.classList.add('hidden');
-            });
-            
-            // --- FAB (Floating Action Button) Logic ---
-            const fabContainer = document.getElementById('fab-container');
-            const fabToggleBtn = document.getElementById('fab-toggle-btn');
-            const scanFabBtn = document.getElementById('scan-fab-btn');
-            const scanModal = document.getElementById('scan-modal');
-            const closeScanModalBtn = document.getElementById('close-scan-modal');
-            const fabNewGoalBtn = document.getElementById('fab-new-goal');
-
-            fabToggleBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                fabContainer.classList.toggle('fab-menu-open');
-                if (fabContainer.classList.contains('fab-menu-open')) {
-                    fabToggleBtn.innerHTML = '<i data-lucide="x" class="w-8 h-8 transition-transform duration-300"></i>';
-                    fabToggleBtn.classList.add('rotate-45');
-                } else {
-                    fabToggleBtn.innerHTML = '<i data-lucide="plus" class="w-8 h-8 transition-transform duration-300"></i>';
-                    fabToggleBtn.classList.remove('rotate-45');
-                }
-                lucide.createIcons();
-            });
-
-            scanFabBtn.addEventListener('click', () => scanModal.classList.remove('hidden'));
-            closeScanModalBtn.addEventListener('click', () => scanModal.classList.add('hidden'));
-            
-            fabNewGoalBtn.addEventListener('click', () => {
-                goalModal.classList.remove('hidden');
-                fabContainer.classList.remove('fab-menu-open'); // Close menu after action
-                fabToggleBtn.innerHTML = '<i data-lucide="plus" class="w-8 h-8 transition-transform duration-300"></i>';
-                fabToggleBtn.classList.remove('rotate-45');
-                lucide.createIcons();
-            });
-            
-            // Close FAB menu when clicking outside
-            document.addEventListener('click', (e) => {
-                if (!fabContainer.contains(e.target) && fabContainer.classList.contains('fab-menu-open')) {
-                    fabContainer.classList.remove('fab-menu-open');
-                    fabToggleBtn.innerHTML = '<i data-lucide="plus" class="w-8 h-8 transition-transform duration-300"></i>';
-                    fabToggleBtn.classList.remove('rotate-45');
-                    lucide.createIcons();
-                }
-            });
-
-
-            // --- Chat Elements & Logic ---
-            const chatMessages = document.getElementById('chat-messages');
-            const chatInput = document.getElementById('chat-input');
-            const sendChatBtn = document.getElementById('send-chat-btn');
-
-            function addMessageToChat(message, from) {
-                const messageWrapper = document.createElement('div');
-                messageWrapper.className = `flex items-start gap-3 chat-bubble ${from === 'user' ? 'justify-end' : ''}`;
-                
-                let bubbleHTML = '';
-                if (from === 'ai') {
-                    bubbleHTML = `
-                        <div class="w-8 h-8 rounded-full gradient-accent flex items-center justify-center font-bold text-sm flex-shrink-0">VQ</div>
-                        <div class="bg-gray-800 p-3 rounded-lg max-w-xs md:max-w-md">
-                            <p>${message}</p>
-                        </div>
-                    `;
-                } else { // user
-                     bubbleHTML = `
-                        <div class="bg-indigo-600 p-3 rounded-lg max-w-xs md:max-w-md">
-                            <p>${message}</p>
-                        </div>
-                        <img src="https://placehold.co/32x32/14b8a6/ffffff?text=A" id="chat-avatar-img" alt="Avatar" class="w-8 h-8 rounded-full border-2 border-teal-500 flex-shrink-0">
-                    `;
-                }
-                messageWrapper.innerHTML = bubbleHTML;
-                chatMessages.appendChild(messageWrapper);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
-
-            function showTypingIndicator() {
-                const typingIndicator = document.createElement('div');
-                typingIndicator.id = 'typing-indicator';
-                typingIndicator.className = 'flex items-start gap-3 chat-bubble';
-                typingIndicator.innerHTML = `
-                    <div class="w-8 h-8 rounded-full gradient-accent flex items-center justify-center font-bold text-sm flex-shrink-0">VQ</div>
-                    <div class="bg-gray-800 p-3 rounded-lg flex items-center gap-1.5">
-                        <span class="w-2 h-2 bg-gray-400 rounded-full typing-dot"></span>
-                        <span class="w-2 h-2 bg-gray-400 rounded-full typing-dot"></span>
-                        <span class="w-2 h-2 bg-gray-400 rounded-full typing-dot"></span>
-                    </div>
-                `;
-                chatMessages.appendChild(typingIndicator);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
-
-            function removeTypingIndicator() {
-                const indicator = document.getElementById('typing-indicator');
-                if (indicator) indicator.remove();
-            }
-
-            async function handleSendMessage() {
-                const message = chatInput.value.trim();
-                if (!message) return;
-
-                addMessageToChat(message, 'user');
-                chatInput.value = '';
-                showTypingIndicator();
-
-                const systemInstruction = { parts: [{ text: "You are Vaulty, a friendly and motivating AI game master and life coach. Your goal is to help users 'level up' their lives by providing supportive, actionable, and encouraging advice. Keep responses concise, positive, and use a friendly, gamified tone with emojis. ✨" }] };
-                
-                try {
-                    const response = await callGeminiAPI(message, systemInstruction);
-                    addMessageToChat(response.text, 'ai');
-                } catch(error) {
-                    addMessageToChat("Oops! My circuits are a bit fuzzy right now. Please try again in a moment.", 'ai');
-                    console.error("Chat API error:", error);
-                } finally {
-                    removeTypingIndicator();
-                }
-            }
-            
-            sendChatBtn.addEventListener('click', handleSendMessage);
-            chatInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleSendMessage();
-                }
-            });
-
-
-            // --- Navigation Logic ---
-            function switchTab(targetId) {
-                navItems.forEach(item => {
-                    item.classList.toggle('nav-active', item.dataset.target === targetId);
-                });
-                Object.values(contentScreens).forEach(screen => screen.classList.add('hidden'));
-                if (contentScreens[targetId]) {
-                    contentScreens[targetId].classList.remove('hidden');
-                    document.getElementById('main-content').scrollTop = 0;
-                }
-            }
-
-            navItems.forEach(item => {
-                item.addEventListener('click', () => switchTab(item.dataset.target));
-            });
-            
-            // --- Initial App Load ---
-            function initializeApp() {
-                switchTab('home-screen');
-                renderQuests();
-                updatePremiumUI();
-            }
-
-            initializeApp();
+            dreamcarResultsGrid.appendChild(card);
         });
-    </script>
+    }
+
+
+    // Initial Setup
+    displayRecentCars();
+    setupDreamCarFinder();
+    switchPage('page-home');
+});
+</script>
+
 </body>
 </html>
 
