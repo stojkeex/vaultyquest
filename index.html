@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auto Assistant - AI Car Finder</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vaulty - AI Car Finder</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -54,7 +54,7 @@
 
         <!-- Top Header -->
         <header class="p-4 flex justify-between items-center border-b border-gray-200 dark:border-gray-800 flex-shrink-0">
-            <h1 class="text-xl font-bold text-gray-800 dark:text-white tracking-tighter">Auto Assistant 🚗</h1>
+            <h1 class="text-xl font-bold text-gray-800 dark:text-white tracking-tighter">Vaulty</h1>
             <button class="w-8 h-8 rounded-full overflow-hidden">
                 <img src="https://placehold.co/100x100/e81cff/ffffff?text=U" alt="User profile picture">
             </button>
@@ -67,7 +67,7 @@
                 <!-- PAGE 1: HOME PAGE -->
                 <div id="page-home" class="page active">
                     <div class="text-center">
-                        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">Welcome to Auto Assistant</h2>
+                        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">Welcome to Vaulty</h2>
                         <p class="text-gray-500 dark:text-gray-400 max-w-2xl mx-auto mb-8">Your AI hub for everything related to cars. Find data, compare models, and discover your next vehicle.</p>
                         <button data-page="page-tools" class="nav-link-btn animated-gradient text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
                             Start Searching
@@ -158,7 +158,7 @@
                 
                 <!-- PAGE 3: RESULTS PAGE -->
                 <div id="page-results" class="page">
-                    <button id="back-btn" class="mb-6 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white font-bold py-2 px-4 rounded-lg flex items-center space-x-2">
+                    <button class="back-button-styled mb-6" data-target-page="page-tools">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
                         <span>Back to Search</span>
                     </button>
@@ -166,7 +166,7 @@
                         <div id="loading-indicator" class="flex items-center justify-center space-x-2 text-gray-500 dark:text-gray-400 py-10">
                             <svg class="animate-spin h-6 w-6 text-violet-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 R-JET-A0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
                             <span>AI is fetching vehicle data...</span>
                         </div>
@@ -185,7 +185,7 @@
 
                 <!-- PAGE 4: BROKER PAGE -->
                 <div id="page-broker" class="page">
-                     <button id="back-to-results-btn" class="mb-6 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white font-bold py-2 px-4 rounded-lg flex items-center space-x-2">
+                     <button class="back-button-styled mb-6" data-target-page="page-results">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
                         <span>Back to Vehicle Details</span>
                     </button>
@@ -212,7 +212,7 @@
 
                 <!-- PAGE 6: DREAM CAR RESULTS -->
                 <div id="page-dreamcar-results" class="page">
-                    <button id="back-to-tools-btn" class="mb-6 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white font-bold py-2 px-4 rounded-lg flex items-center space-x-2">
+                    <button class="back-button-styled mb-6" data-target-page="page-tools">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
                         <span>Back to Tools</span>
                     </button>
@@ -230,7 +230,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         </main>
 
@@ -251,9 +250,32 @@
         </nav>
     </div>
 
+    <!-- Premium Modal -->
+    <div id="premium-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+        <div class="gradient-border max-w-md w-full mx-4">
+            <div class="bg-white dark:bg-black rounded-lg p-8 text-center relative">
+                <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+                <div class="animated-gradient w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15.5 13.5 3.5-3.5a2.1 2.1 0 1 0-3-3l-3.5 3.5a2.1 2.1 0 1 0 3 3z"></path><path d="M8.5 4.5 5 8a2.1 2.1 0 1 0 3 3l3.5-3.5a2.1 2.1 0 1 0-3-3z"></path><path d="m14 15.5 3.5 3.5a2.1 2.1 0 1 0 3-3l-3.5-3.5a2.1 2.1 0 1 0-3 3z"></path><path d="M4.5 8.5 8 5a2.1 2.1 0 1 0-3-3L1.5 5.5a2.1 2.1 0 1 0 3 3z"></path></svg>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Unlock Premium Features</h2>
+                <p class="text-gray-500 dark:text-gray-400 mb-6">Get access to expert reviews, full AI analysis, AI broker services, and more.</p>
+                <button class="w-full animated-gradient text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+                    Upgrade Now - $29.99/month
+                </button>
+            </div>
+        </div>
+    </div>
+
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     
+    // --- App State ---
+    const isPremiumUser = false; // Set to true to see premium features unlocked
+
     // --- Car Data ---
     // Function to generate years for a range
     const generateYears = (start, end) => Array.from({ length: end - start + 1 }, (_, i) => end - i).map(String);
@@ -720,8 +742,16 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         searchVehicle(currentCar);
     });
-    backBtn.addEventListener('click', () => switchPage('page-tools'));
-    backToResultsBtn.addEventListener('click', () => switchPage('page-results'));
+    
+    document.querySelectorAll('.back-button-styled').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const targetPage = e.currentTarget.dataset.targetPage;
+            if(targetPage) {
+                switchPage(targetPage);
+            }
+        });
+    });
+
 
     async function searchVehicle(car) {
         if (!car.brand || !car.model || !car.submodel || !car.year) {
@@ -757,6 +787,11 @@ VERY IMPORTANT: Your response MUST be a single, valid JSON object without any su
   ],
   "part_prices": {
     "tire_eur": "e.g., '€250 - €400'", "brake_pads_eur": "e.g., '€150 - €250'"
+  },
+   "full_analysis": {
+    "common_faults": "List common mechanical or electrical issues for this model and year.",
+    "maintenance_tips": "Provide key maintenance tips to keep the car in good shape.",
+    "service_contacts": "Suggest generic types of specialists to contact for issues, e.g., 'Certified brand mechanic', 'Independent European car specialist'."
   },
   "tuning_versions": [
     {
@@ -946,6 +981,24 @@ If a piece of information is not available, return "N/A" for strings, empty arra
             cardWrapper.innerHTML = `<div class="bg-white dark:bg-black rounded-lg p-6 h-full flex flex-col"><h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4">${title}</h3><div class="text-gray-600 dark:text-gray-300 flex-grow">${content}</div></div>`;
             return cardWrapper;
         };
+        
+        const createLockedCard = (title, cardClasses = '') => {
+            const card = document.createElement('div');
+            card.className = `bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-dashed border-gray-300 dark:border-gray-700 flex items-center justify-between ${cardClasses}`;
+            card.innerHTML = `
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">${title}</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">This is a premium feature.</p>
+                </div>
+                <button class="premium-cta-btn animated-gradient text-white font-bold py-2 px-4 rounded-lg flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    <span>Unlock</span>
+                </button>
+            `;
+            card.querySelector('.premium-cta-btn').onclick = showPremiumModal;
+            return card;
+        };
+
 
         const createStat = (label, value, unit, iconSvg) => {
             if (!value || value === 'N/A') return '';
@@ -963,9 +1016,8 @@ If a piece of information is not available, return "N/A" for strings, empty arra
             return `<div class="flex items-center">${stars}<span class="ml-2 text-gray-500 dark:text-gray-400">${numRating.toFixed(1)}/5.0</span></div>`;
         };
 
+        // --- FREE CARDS ---
         if (data.description) resultsGrid.appendChild(createCard('General Overview', `<p>${data.description}</p>`, 'md:col-span-2'));
-        if (data.expert_review) resultsGrid.appendChild(createCard('Expert Review', `<p>${data.expert_review}</p>`, 'md:col-span-2'));
-
         if (data.performance) {
             const powerIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-2 h-6 w-6 text-violet-400"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`;
             const speedIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-2 h-6 w-6 text-violet-400"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>`;
@@ -973,55 +1025,96 @@ If a piece of information is not available, return "N/A" for strings, empty arra
             const statsContent = `<div class="flex justify-around items-start h-full space-x-4">${createStat('Power', data.performance.power_hp, 'HP', powerIcon)}${createStat('Top Speed', data.performance.top_speed_kmh, 'km/h', speedIcon)}${createStat('0-100 km/h', data.performance.acceleration_sec, 's', accelIcon)}</div>`;
             resultsGrid.appendChild(createCard('Performance', statsContent, 'md:col-span-2'));
         }
-        
         if (data.price) {
             const content = `<div class="flex flex-col space-y-4"><div><div class="text-sm text-gray-500 dark:text-gray-400">Price (New)</div><div class="text-2xl font-bold text-gray-900 dark:text-white">${data.price.new_eur || 'N/A'}</div></div><div><div class="text-sm text-gray-500 dark:text-gray-400">Price (Used)</div><div class="text-2xl font-bold text-gray-900 dark:text-white">${data.price.used_eur || 'N/A'}</div></div></div>`;
             resultsGrid.appendChild(createCard('Price', content));
         }
-
-        if (data.rating) resultsGrid.appendChild(createCard('Expert Rating', createStarRating(data.rating)));
-        
         if (data.colors && data.colors.length > 0) {
             const colorsHtml = data.colors.map(c => `<div class="flex items-center"><span class="w-6 h-6 rounded-full border-2 border-white/20 mr-3" style="background-color: ${c.hex};"></span><span>${c.name}</span></div>`).join('');
             resultsGrid.appendChild(createCard('Available Colors', `<div class="flex flex-col space-y-2">${colorsHtml}</div>`));
         }
-
-        if (data.price_history && data.price_history.length > 0) {
-            const historyHtml = data.price_history.map(p => `<li class="flex justify-between"><span>${p.year}</span><span class="font-semibold">${p.price_eur}</span></li>`).join('');
-            resultsGrid.appendChild(createCard('Price Over Time', `<ul class="space-y-2">${historyHtml}</ul>`));
-        }
-        
         if (data.modifications && data.modifications.length > 0) {
             const modsHtml = data.modifications.map(m => `<div><h4 class="font-semibold text-white">${m.name}</h4><p class="text-sm">${m.description}</p></div>`).join('');
             resultsGrid.appendChild(createCard('Popular Modifications', `<div class="space-y-3">${modsHtml}</div>`, 'md:col-span-2'));
         }
-
         if (data.part_prices && Object.keys(data.part_prices).length > 0) {
             const partsHtml = Object.entries(data.part_prices).map(([key, value]) => `<li class="flex justify-between"><span class="capitalize">${key.replace('_eur', '').replace('_', ' ')}</span><span class="font-semibold">${value}</span></li>`).join('');
             resultsGrid.appendChild(createCard('Common Part Prices', `<ul class="space-y-2">${partsHtml}</ul>`, 'md:col-span-2'));
         }
-        
         if (data.tuning_versions && data.tuning_versions.length > 0) {
-            const tuningHtml = data.tuning_versions.map(t => `
-                <div>
-                    <h4 class="font-semibold text-white">${t.tuner} - ${t.model_name}</h4>
-                    <p class="text-sm">${t.description}</p>
-                </div>
-            `).join('');
+            const tuningHtml = data.tuning_versions.map(t => `<div><h4 class="font-semibold text-white">${t.tuner} - ${t.model_name}</h4><p class="text-sm">${t.description}</p></div>`).join('');
             resultsGrid.appendChild(createCard('Famous Tuning Versions', `<div class="space-y-4">${tuningHtml}</div>`, 'md:col-span-2'));
         }
 
-        // Add Broker CTA button
-        const brokerBtn = document.createElement('button');
-        brokerBtn.id = 'find-broker-btn';
-        brokerBtn.className = 'w-full max-w-sm mx-auto animated-gradient text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 flex items-center justify-center space-x-2';
-        brokerBtn.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            <span>Find AI Broker & Offers</span>
-        `;
-        brokerBtn.onclick = () => findBroker(currentCar);
+        // --- PREMIUM CARDS ---
+        if (isPremiumUser && data.expert_review) {
+            resultsGrid.appendChild(createCard('Expert Review', `<p>${data.expert_review}</p>`, 'md:col-span-2'));
+        } else {
+            resultsGrid.appendChild(createLockedCard('Expert Review', 'md:col-span-2'));
+        }
+        
+        if (isPremiumUser && data.rating) {
+            resultsGrid.appendChild(createCard('Expert Rating', createStarRating(data.rating)));
+        } else {
+             resultsGrid.appendChild(createLockedCard('Expert Rating'));
+        }
+        
+        if (isPremiumUser && data.price_history && data.price_history.length > 0) {
+            const historyHtml = data.price_history.map(p => `<li class="flex justify-between"><span>${p.year}</span><span class="font-semibold">${p.price_eur}</span></li>`).join('');
+            resultsGrid.appendChild(createCard('Price Over Time', `<ul class="space-y-2">${historyHtml}</ul>`));
+        } else {
+             resultsGrid.appendChild(createLockedCard('Price Over Time'));
+        }
+        
+        if (isPremiumUser && data.full_analysis) {
+            const analysisContent = `
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="font-semibold text-white">Common Faults</h4>
+                        <p class="text-sm">${data.full_analysis.common_faults}</p>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-white">Maintenance Tips</h4>
+                        <p class="text-sm">${data.full_analysis.maintenance_tips}</p>
+                    </div>
+                     <div>
+                        <h4 class="font-semibold text-white">Service Contacts</h4>
+                        <p class="text-sm">${data.full_analysis.service_contacts}</p>
+                    </div>
+                </div>
+            `;
+            resultsGrid.appendChild(createCard('Full AI Analysis', analysisContent, 'md:col-span-2'));
+        } else {
+             resultsGrid.appendChild(createLockedCard('Full AI Analysis', 'md:col-span-2'));
+        }
+
+        // --- BROKER CTA ---
         brokerCtaContainer.innerHTML = '';
-        brokerCtaContainer.appendChild(brokerBtn);
+        if(isPremiumUser) {
+            const brokerBtn = document.createElement('button');
+            brokerBtn.className = 'w-full max-w-sm mx-auto animated-gradient text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 flex items-center justify-center space-x-2';
+            brokerBtn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <span>Find AI Broker & Offers</span>
+            `;
+            brokerBtn.onclick = () => findBroker(currentCar);
+            brokerCtaContainer.appendChild(brokerBtn);
+        } else {
+             const lockedBrokerBtn = document.createElement('div');
+             lockedBrokerBtn.className = 'w-full max-w-sm mx-auto bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-dashed border-gray-300 dark:border-gray-700 flex items-center justify-between';
+             lockedBrokerBtn.innerHTML = `
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">AI Broker & Offers</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Get personalized financing and insurance.</p>
+                </div>
+                <button class="premium-cta-btn animated-gradient text-white font-bold py-2 px-4 rounded-lg flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    <span>Unlock</span>
+                </button>
+            `;
+            lockedBrokerBtn.querySelector('.premium-cta-btn').onclick = showPremiumModal;
+            brokerCtaContainer.appendChild(lockedBrokerBtn);
+        }
     }
 
     // --- Local Storage Logic for Recent Cars ---
@@ -1113,7 +1206,6 @@ If a piece of information is not available, return "N/A" for strings, empty arra
         }
 
         findDreamCarBtn.addEventListener('click', findDreamCar);
-        backToToolsBtn.addEventListener('click', () => switchPage('page-tools'));
     }
 
     async function findDreamCar() {
@@ -1205,6 +1297,15 @@ Provide diverse and interesting recommendations.`;
         });
     }
 
+    // --- Premium Modal Logic ---
+    const premiumModal = document.getElementById('premium-modal');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    
+    function showPremiumModal() { premiumModal.classList.remove('hidden'); }
+    function hidePremiumModal() { premiumModal.classList.add('hidden'); }
+
+    closeModalBtn.addEventListener('click', hidePremiumModal);
+
 
     // Initial Setup
     displayRecentCars();
@@ -1215,4 +1316,5 @@ Provide diverse and interesting recommendations.`;
 
 </body>
 </html>
+
 
